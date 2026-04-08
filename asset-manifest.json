@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/DevFinder/static/css/main.bfdc40fa.css",
+    "main.js": "/DevFinder/static/js/main.75f55939.js",
+    "index.html": "/DevFinder/index.html",
+    "main.bfdc40fa.css.map": "/DevFinder/static/css/main.bfdc40fa.css.map",
+    "main.75f55939.js.map": "/DevFinder/static/js/main.75f55939.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.bfdc40fa.css",
+    "static/js/main.75f55939.js"
+  ]
+}
