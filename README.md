@@ -1,70 +1,117 @@
-# Getting Started with Create React App
+# 🚀 DevFinder - Developer Portfolio & Project Showcase
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+![React](https://img.shields.io/badge/React-18.2.0-blue)
+![Framer Motion](https://img.shields.io/badge/Framer%20Motion-10.16.4-purple)
+![React Router](https://img.shields.io/badge/React%20Router-6.14.0-red)
 
-## Available Scripts
+A modern, feature-rich developer portfolio platform built with React. Showcase your projects, share your knowledge through blogs, and connect with recruiters - all in one place.
 
-In the project directory, you can run:
+## ✨ Live Demo
 
-### `npm start`
+🔗 **Live URL:** [DevFinder Live Demo](https://your-username.github.io/DevFinder)
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## 📸 Screenshots
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+![Homepage](https://via.placeholder.com/800x400?text=DevFinder+Homepage)
+![Projects Page](https://via.placeholder.com/800x400?text=Projects+Page)
+![Blog Page](https://via.placeholder.com/800x400?text=Blog+Page)
 
-### `npm test`
+## 🎯 Features
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### ✅ Implemented Features
+- **🏠 Modern Homepage** - Animated hero section with typing effect
+- **📁 Projects Showcase** - Display all GitHub projects with tech stack
+- **🔗 Live URLs** - Deployed projects with "Coming Soon" status
+- **📝 Blog System** - Markdown-based blog with categories & search
+- **👨‍💻 Developer Profile** - Personal portfolio with skills & stats
+- **📧 Contact Form** - Working contact form for recruiters
+- **📄 Resume/CV Download** - Multiple download options (Resume, Cover Letter, Both)
+- **📱 Fully Responsive** - Works on all devices
+- **⚡ Smooth Animations** - Framer Motion powered
 
-### `npm run build`
+### 🛠️ Tech Stack
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+| Category | Technologies |
+|----------|-------------|
+| **Frontend** | React 18, HTML5, CSS3 |
+| **Styling** | CSS-in-JS, Framer Motion |
+| **Routing** | React Router DOM v6 |
+| **Icons** | React Icons |
+| **Markdown** | React Markdown, remark-gfm |
+| **HTTP Client** | Axios |
+| **Version Control** | Git & GitHub |
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## 📂 Project Structure
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+DevFinder/
+├── public/
+│ ├── Prem_Patel_Resume.pdf
+│ ├── Prem_Patel_Cover_Letter.pdf
+│ └── Prem_Patel_Both.pdf
+├── src/
+│ ├── components/
+│ │ └── Header.jsx
+│ ├── pages/
+│ │ ├── HomePage.jsx
+│ │ ├── ProjectsPage.jsx
+│ │ ├── LiveUrlPage.jsx
+│ │ ├── BlogPage.jsx
+│ │ ├── DevelopersPage.jsx
+│ │ └── ContactPage.jsx
+│ ├── App.js
+│ ├── App.css
+│ └── index.js
+├── .gitignore
+├── package.json
+├── README.md
+└── package-lock.json
 
-### `npm run eject`
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## 🚀 Getting Started
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Prerequisites
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+- Node.js (v14 or higher)
+- npm (v6 or higher)
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### Installation
 
-## Learn More
+```bash
+# Clone the repository
+git clone https://github.com/prem-patel22/DevFinder.git
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+# Navigate to project directory
+cd DevFinder
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+# Install dependencies
+npm install
 
-### Code Splitting
+# Start development server
+npm start
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+# Build for Production
+npm run build
 
-### Analyzing the Bundle Size
+📧 Contact
+Prem Patel
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+Email: patelpremalpeshkumar@gmail.com
 
-### Making a Progressive Web App
+GitHub: @prem-patel22
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+LinkedIn: Prem Patel
 
-### Advanced Configuration
+📄 License
+This project is open source and available under the MIT License.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+🙏 Acknowledgments
+React Team for amazing framework
 
-### Deployment
+Framer Motion for smooth animations
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+All open-source contributors
 
-### `npm run build` fails to minify
+⭐ Show your support
+Give a ⭐️ if this project helped you!
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Made with ❤️ by Prem Patel | Dharmsinh Desai University, Nadiad
