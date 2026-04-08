@@ -1,23 +1,19 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { FaSearch, FaTag, FaCalendar, FaUser, FaBookOpen, FaArrowRight, FaTimes } from 'react-icons/fa';
+import { FaSearch, FaCalendar, FaUser, FaBookOpen, FaArrowRight, FaTimes, FaTag } from 'react-icons/fa';
 
-// Sample blog posts
+// Sample blog posts - MAKE SURE THIS ARRAY IS HERE
 const blogPosts = [
   {
     id: 1,
     title: "Getting Started with React Hooks",
-    excerpt: "Learn how to use useState, useEffect, and custom hooks to build powerful React applications. A complete guide for beginners.",
+    excerpt: "Learn how to use useState, useEffect, and custom hooks to build powerful React applications.",
     content: `
 # Getting Started with React Hooks
 
-React Hooks revolutionized how we write React components. Let me share my journey learning them!
-
-## Why Hooks?
-
-Before Hooks, class components were the only way to use state and lifecycle methods. Hooks allow functional components to have state and side effects.
+React Hooks revolutionized how we write React components.
 
 ## useState Example
 
@@ -35,53 +31,9 @@ function Counter() {
 }
 \`\`\`
 
-## useEffect Example
-
-\`\`\`jsx
-import React, { useState, useEffect } from 'react';
-
-function UserProfile({ userId }) {
-  const [user, setUser] = useState(null);
-  
-  useEffect(() => {
-    fetchUser(userId).then(setUser);
-  }, [userId]);
-  
-  return <div>{user?.name}</div>;
-}
-\`\`\`
-
-## Custom Hooks
-
-Create reusable logic by extracting it into custom hooks:
-
-\`\`\`jsx
-function useLocalStorage(key, initialValue) {
-  const [storedValue, setStoredValue] = useState(() => {
-    try {
-      const item = window.localStorage.getItem(key);
-      return item ? JSON.parse(item) : initialValue;
-    } catch (error) {
-      return initialValue;
-    }
-  });
-  
-  const setValue = (value) => {
-    try {
-      setStoredValue(value);
-      window.localStorage.setItem(key, JSON.stringify(value));
-    } catch (error) {
-      console.log(error);
-    }
-  };
-  
-  return [storedValue, setValue];
-}
-\`\`\`
-
 ## Conclusion
 
-Hooks make React code cleaner and more reusable. Start using them in your next project!
+Hooks make React code cleaner and more reusable!
     `,
     category: "React Tips",
     date: "April 8, 2026",
@@ -92,63 +44,24 @@ Hooks make React code cleaner and more reusable. Start using them in your next p
   {
     id: 2,
     title: "Building Your First Machine Learning Model with Python",
-    excerpt: "A beginner-friendly guide to creating your first ML model using Scikit-learn. Learn the fundamentals of machine learning.",
+    excerpt: "A beginner-friendly guide to creating your first ML model using Scikit-learn.",
     content: `
 # Building Your First Machine Learning Model
-
-Machine Learning sounds complex, but with Python and Scikit-learn, it's surprisingly accessible!
-
-## Setting Up Environment
-
-\`\`\`bash
-pip install scikit-learn pandas numpy matplotlib
-\`\`\`
-
-## Loading Data
-
-\`\`\`python
-import pandas as pd
-from sklearn.datasets import load_iris
-
-# Load iris dataset
-iris = load_iris()
-X = iris.data  # Features
-y = iris.target  # Labels
-\`\`\`
 
 ## Training a Model
 
 \`\`\`python
-from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 
-# Split data
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
-
-# Train model
 model = RandomForestClassifier()
 model.fit(X_train, y_train)
-
-# Make predictions
-predictions = model.predict(X_test)
 accuracy = model.score(X_test, y_test)
 print(f"Accuracy: {accuracy:.2f}")
 \`\`\`
 
-## Visualizing Results
-
-\`\`\`python
-import matplotlib.pyplot as plt
-
-plt.figure(figsize=(10, 6))
-plt.bar(iris.feature_names, model.feature_importances_)
-plt.title('Feature Importance')
-plt.show()
-\`\`\`
-
 ## Next Steps
 
-Try different algorithms like SVM, KNN, or Neural Networks. Happy learning!
+Try different algorithms like SVM, KNN, or Neural Networks!
     `,
     category: "ML Learning",
     date: "April 5, 2026",
@@ -159,49 +72,9 @@ Try different algorithms like SVM, KNN, or Neural Networks. Happy learning!
   {
     id: 3,
     title: "Spring Boot REST API Tutorial",
-    excerpt: "Build production-ready REST APIs with Spring Boot and MySQL. Learn best practices for API development.",
+    excerpt: "Build production-ready REST APIs with Spring Boot and MySQL.",
     content: `
 # Spring Boot REST API Tutorial
-
-Spring Boot makes building REST APIs incredibly easy. Let me show you how!
-
-## Project Setup
-
-Use Spring Initializr (start.spring.io) with dependencies:
-- Spring Web
-- Spring Data JPA
-- MySQL Driver
-- Lombok
-
-## Creating Entity
-
-\`\`\`java
-@Entity
-@Table(name = "users")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    
-    @Column(nullable = false)
-    private String name;
-    
-    @Column(unique = true, nullable = false)
-    private String email;
-}
-\`\`\`
-
-## Creating Repository
-
-\`\`\`java
-@Repository
-public interface UserRepository extends JpaRepository<User, Long> {
-    Optional<User> findByEmail(String email);
-}
-\`\`\`
 
 ## Creating Controller
 
@@ -209,69 +82,27 @@ public interface UserRepository extends JpaRepository<User, Long> {
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
-    @Autowired
-    private UserRepository userRepository;
-    
     @GetMapping
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
-    
-    @PostMapping
-    public User createUser(@RequestBody User user) {
-        return userRepository.save(user);
-    }
-    
-    @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long id) {
-        return userRepository.findById(id)
-            .map(ResponseEntity::ok)
-            .orElse(ResponseEntity.notFound().build());
-    }
 }
 \`\`\`
 
-## Application Properties
-
-\`\`\`properties
-spring.datasource.url=jdbc:mysql://localhost:3306/dbname
-spring.datasource.username=root
-spring.datasource.password=password
-spring.jpa.hibernate.ddl-auto=update
-\`\`\`
-
-## Testing with cURL
-
-\`\`\`bash
-# GET all users
-curl http://localhost:8080/api/users
-
-# POST new user
-curl -X POST http://localhost:8080/api/users \\
-  -H "Content-Type: application/json" \\
-  -d '{"name":"John","email":"john@example.com"}'
-\`\`\`
-
-Your REST API is ready! Deploy to cloud platforms like Heroku or AWS.
+Your REST API is ready!
     `,
     category: "Spring Boot Guides",
     date: "April 1, 2026",
     readTime: "10 min read",
     author: "Prem Patel",
-    tags: ["Java", "Spring Boot", "REST API", "MySQL"]
+    tags: ["Java", "Spring Boot", "REST API"]
   },
   {
     id: 4,
     title: "Understanding JavaScript Closures",
-    excerpt: "Deep dive into JavaScript closures - one of the most important concepts for mastering JavaScript.",
+    excerpt: "Deep dive into JavaScript closures - a fundamental concept.",
     content: `
 # Understanding JavaScript Closures
-
-Closures are a fundamental concept in JavaScript that every developer should understand.
-
-## What is a Closure?
-
-A closure is the combination of a function bundled together with references to its surrounding state.
 
 ## Simple Example
 
@@ -286,12 +117,6 @@ function outerFunction(x) {
 const add5 = outerFunction(5);
 console.log(add5(3)); // 8
 \`\`\`
-
-## Practical Use Cases
-
-1. **Data Privacy**
-2. **Function Factories**
-3. **Event Handlers**
 
 ## Conclusion
 
@@ -312,18 +137,36 @@ function BlogPage() {
   
   const categories = ['All', 'React Tips', 'ML Learning', 'Spring Boot Guides', 'JavaScript'];
 
+  // Filter posts based on search and category
   const filteredPosts = blogPosts.filter(post => {
-    const matchesSearch = post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          post.excerpt.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          post.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+    const matchesSearch = searchTerm === '' || 
+      post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      post.excerpt.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      post.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+    
     const matchesCategory = selectedCategory === 'All' || post.category === selectedCategory;
+    
     return matchesSearch && matchesCategory;
   });
 
-  const fadeInUp = {
-    hidden: { opacity: 0, y: 30 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
-  };
+  // If no posts, show message
+  if (blogPosts.length === 0) {
+    return (
+      <div style={{ 
+        minHeight: '100vh', 
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        padding: '60px 20px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        <div style={{ background: 'white', padding: '40px', borderRadius: '20px', textAlign: 'center' }}>
+          <h2>No blog posts found</h2>
+          <p>Please check the blogPosts array in BlogPage.jsx</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ 
@@ -334,33 +177,25 @@ function BlogPage() {
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
         
         {!selectedPost ? (
-          // Blog List View
           <>
-            <motion.div
-              initial="hidden"
-              animate="visible"
-              variants={fadeInUp}
-              style={{ textAlign: 'center', marginBottom: '50px' }}
-            >
+            {/* Header */}
+            <div style={{ textAlign: 'center', marginBottom: '50px' }}>
               <h1 style={{ fontSize: '3rem', color: 'white', marginBottom: '15px' }}>
                 📝 Tech Blog
               </h1>
               <p style={{ fontSize: '1.2rem', color: 'rgba(255,255,255,0.95)' }}>
                 Sharing my learning journey in development and AI/ML
               </p>
-            </motion.div>
+            </div>
 
-            {/* Search and Filter */}
-            <motion.div
-              variants={fadeInUp}
-              style={{
-                display: 'flex',
-                flexWrap: 'wrap',
-                gap: '15px',
-                marginBottom: '40px',
-                justifyContent: 'center'
-              }}
-            >
+            {/* Search Bar */}
+            <div style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: '15px',
+              marginBottom: '40px',
+              justifyContent: 'center'
+            }}>
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -373,7 +208,7 @@ function BlogPage() {
                 <FaSearch style={{ color: '#999', marginRight: '10px' }} />
                 <input
                   type="text"
-                  placeholder="Search articles by title, tags, or content..."
+                  placeholder="Search articles..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   style={{
@@ -402,79 +237,77 @@ function BlogPage() {
                       border: 'none',
                       borderRadius: '25px',
                       cursor: 'pointer',
-                      fontWeight: 'bold',
-                      transition: 'all 0.3s'
+                      fontWeight: 'bold'
                     }}
                   >
                     {cat}
                   </button>
                 ))}
               </div>
-            </motion.div>
+            </div>
 
             {/* Results Count */}
-            <motion.div
-              variants={fadeInUp}
-              style={{
-                textAlign: 'center',
-                marginBottom: '20px',
-                color: 'rgba(255,255,255,0.8)'
-              }}
-            >
+            <div style={{
+              textAlign: 'center',
+              marginBottom: '30px',
+              color: 'white',
+              fontSize: '1.1rem'
+            }}>
               Found {filteredPosts.length} article{filteredPosts.length !== 1 ? 's' : ''}
-            </motion.div>
+            </div>
 
             {/* Blog Posts Grid */}
-            <motion.div
-              variants={{
-                hidden: { opacity: 0 },
-                visible: { transition: { staggerChildren: 0.1 } }
-              }}
-              initial="hidden"
-              animate="visible"
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
-                gap: '30px'
-              }}
-            >
-              {filteredPosts.map(post => (
-                <motion.div
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
+              gap: '30px'
+            }}>
+              {filteredPosts.map((post) => (
+                <div
                   key={post.id}
-                  variants={fadeInUp}
-                  whileHover={{ y: -10 }}
+                  onClick={() => setSelectedPost(post)}
                   style={{
                     background: 'white',
-                    borderRadius: '15px',
+                    borderRadius: '20px',
                     overflow: 'hidden',
                     cursor: 'pointer',
-                    boxShadow: '0 5px 15px rgba(0,0,0,0.1)',
-                    transition: 'all 0.3s'
+                    boxShadow: '0 10px 30px rgba(0,0,0,0.15)',
+                    transition: 'transform 0.3s ease'
                   }}
-                  onClick={() => setSelectedPost(post)}
+                  onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-10px)'}
+                  onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
                 >
                   <div style={{
                     background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                    padding: '20px',
+                    padding: '30px',
                     color: 'white'
                   }}>
-                    <FaBookOpen size={30} />
+                    <FaBookOpen size={40} />
                   </div>
-                  <div style={{ padding: '20px' }}>
-                    <h3 style={{ marginBottom: '10px', color: '#333' }}>{post.title}</h3>
-                    <p style={{ color: '#666', marginBottom: '15px', lineHeight: '1.6' }}>
+                  <div style={{ padding: '25px' }}>
+                    <h3 style={{ 
+                      marginBottom: '12px', 
+                      color: '#333',
+                      fontSize: '1.3rem'
+                    }}>
+                      {post.title}
+                    </h3>
+                    <p style={{ 
+                      color: '#666', 
+                      marginBottom: '15px', 
+                      lineHeight: '1.6'
+                    }}>
                       {post.excerpt}
                     </p>
                     <div style={{
                       display: 'flex',
                       justifyContent: 'space-between',
-                      alignItems: 'center',
                       marginBottom: '15px',
-                      fontSize: '14px',
+                      fontSize: '13px',
                       color: '#999'
                     }}>
-                      <span><FaCalendar style={{ marginRight: '5px' }} />{post.date}</span>
-                      <span><FaUser style={{ marginRight: '5px' }} />{post.author}</span>
+                      <span><FaCalendar /> {post.date}</span>
+                      <span><FaUser /> {post.author}</span>
                       <span>{post.readTime}</span>
                     </div>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
@@ -482,74 +315,72 @@ function BlogPage() {
                         <span key={tag} style={{
                           background: '#f0f0f0',
                           color: '#667eea',
-                          padding: '4px 10px',
+                          padding: '4px 12px',
                           borderRadius: '15px',
-                          fontSize: '12px'
+                          fontSize: '11px'
                         }}>
-                          #{tag}
+                          <FaTag style={{ marginRight: '4px' }} />
+                          {tag}
                         </span>
                       ))}
                     </div>
-                    <button style={{
-                      marginTop: '15px',
-                      padding: '8px 20px',
-                      background: '#667eea',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '20px',
-                      cursor: 'pointer',
-                      width: '100%'
-                    }}>
-                      Read More <FaArrowRight />
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedPost(post);
+                      }}
+                      style={{
+                        marginTop: '20px',
+                        padding: '10px',
+                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '25px',
+                        cursor: 'pointer',
+                        width: '100%',
+                        fontWeight: 'bold'
+                      }}
+                    >
+                      Read Article <FaArrowRight style={{ marginLeft: '8px' }} />
                     </button>
                   </div>
-                </motion.div>
+                </div>
               ))}
-            </motion.div>
+            </div>
 
-            {/* No Results Message */}
+            {/* No Results */}
             {filteredPosts.length === 0 && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                style={{
-                  textAlign: 'center',
-                  padding: '60px',
-                  background: 'white',
-                  borderRadius: '20px',
-                  marginTop: '40px'
-                }}
-              >
-                <h3 style={{ color: '#333', marginBottom: '10px' }}>No articles found</h3>
-                <p style={{ color: '#666' }}>
-                  Try adjusting your search or filter to find what you're looking for.
-                </p>
-              </motion.div>
+              <div style={{
+                textAlign: 'center',
+                padding: '60px',
+                background: 'white',
+                borderRadius: '20px',
+                marginTop: '40px'
+              }}>
+                <h3>No articles found</h3>
+                <p>Try adjusting your search or filter</p>
+              </div>
             )}
           </>
         ) : (
           // Single Post View
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            style={{
-              background: 'white',
-              borderRadius: '20px',
-              padding: '40px',
-              maxWidth: '800px',
-              margin: '0 auto'
-            }}
-          >
+          <div style={{
+            background: 'white',
+            borderRadius: '20px',
+            padding: '40px',
+            maxWidth: '900px',
+            margin: '0 auto'
+          }}>
             <button
               onClick={() => setSelectedPost(null)}
               style={{
                 background: '#667eea',
                 color: 'white',
                 border: 'none',
-                padding: '10px 20px',
-                borderRadius: '10px',
+                padding: '10px 25px',
+                borderRadius: '25px',
                 cursor: 'pointer',
-                marginBottom: '20px'
+                marginBottom: '30px'
               }}
             >
               ← Back to all posts
@@ -561,21 +392,19 @@ function BlogPage() {
               marginBottom: '30px',
               color: '#666',
               fontSize: '14px',
-              flexWrap: 'wrap'
+              paddingBottom: '20px',
+              borderBottom: '1px solid #eee'
             }}>
               <span><FaCalendar /> {selectedPost.date}</span>
               <span><FaUser /> {selectedPost.author}</span>
               <span>{selectedPost.readTime}</span>
             </div>
-            <div className="markdown-content" style={{
-              lineHeight: '1.8',
-              color: '#555'
-            }}>
+            <div className="markdown-content">
               <ReactMarkdown remarkPlugins={[remarkGfm]}>
                 {selectedPost.content}
               </ReactMarkdown>
             </div>
-          </motion.div>
+          </div>
         )}
       </div>
     </div>
