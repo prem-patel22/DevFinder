@@ -143,6 +143,20 @@ function Header() {
                 {link.name}
               </Link>
             ))}
+            {/* Bookings Link - Desktop - Only visible to Admin */}
+            {isAdmin() && (
+              <Link
+                to="/bookings"
+                style={{
+                  textDecoration: 'none',
+                  color: location.pathname === '/bookings' ? '#667eea' : '#333',
+                  fontWeight: location.pathname === '/bookings' ? 'bold' : 'normal',
+                  fontSize: '14px'
+                }}
+              >
+                📅 Bookings
+              </Link>
+            )}
           </div>
 
           <VisitorCounter />
@@ -264,9 +278,14 @@ function Header() {
                 )}
               </div>
               {isAdmin() && (
-                <Link to="/admin" style={{ color: '#667eea', textDecoration: 'none', fontSize: '14px', fontWeight: 'bold' }}>
-                  {t('nav.dashboard')}
-                </Link>
+                <>
+                  <Link to="/admin" style={{ color: '#667eea', textDecoration: 'none', fontSize: '14px', fontWeight: 'bold' }}>
+                    {t('nav.dashboard')}
+                  </Link>
+                  <Link to="/bookings" style={{ color: '#f59e0b', textDecoration: 'none', fontSize: '14px', fontWeight: 'bold' }}>
+                    📅 Bookings
+                  </Link>
+                </>
               )}
               <motion.button
                 whileHover={{ scale: 1.05 }}
@@ -338,6 +357,12 @@ function Header() {
                 {link.name}
               </Link>
             ))}
+            {/* Bookings Link - Mobile Menu - Only visible to Admin */}
+            {isAdmin() && (
+              <Link to="/bookings" onClick={() => setIsOpen(false)} style={{ padding: '10px', textDecoration: 'none', color: location.pathname === '/bookings' ? '#667eea' : '#333' }}>
+                📅 Bookings
+              </Link>
+            )}
             <div style={{ padding: '10px 0' }}><VisitorCounter /></div>
             {!user ? (
               <button onClick={() => { setShowLoginModal(true); setIsOpen(false); }} style={{ padding: '10px', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
@@ -353,7 +378,12 @@ function Header() {
                     </span>
                   )}
                 </div>
-                {isAdmin() && <Link to="/admin" style={{ display: 'block', marginBottom: '10px', color: '#667eea' }}>{t('nav.dashboard')}</Link>}
+                {isAdmin() && (
+                  <>
+                    <Link to="/admin" style={{ display: 'block', marginBottom: '10px', color: '#667eea' }}>{t('nav.dashboard')}</Link>
+                    <Link to="/bookings" style={{ display: 'block', marginBottom: '10px', color: '#f59e0b' }}>📅 Bookings</Link>
+                  </>
+                )}
                 <button onClick={logout} style={{ width: '100%', padding: '8px', background: '#dc3545', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>{t('nav.logout')}</button>
               </div>
             )}

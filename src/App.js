@@ -16,6 +16,7 @@ import DevelopersPage from './pages/DevelopersPage';
 import BlogPage from './pages/BlogPage';
 import ContactPage from './pages/ContactPage';
 import AdminDashboard from './pages/AdminDashboard';
+import BookingsPage from './pages/BookingsPage';
 import './App.css';
 
 // Page-specific SEO component
@@ -154,6 +155,28 @@ function AnimatedRoutes() {
                   transition={{ duration: 0.3 }}
                 >
                   <AdminDashboard />
+                </motion.div>
+              </>
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/bookings" 
+          element={
+            <ProtectedRoute adminOnly={true}>
+              <>
+                <PageSEO 
+                  title="Bookings Management | DevFinder"
+                  description="Admin dashboard for managing client bookings, confirmations, and cancellations."
+                  path="/bookings"
+                />
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <BookingsPage />
                 </motion.div>
               </>
             </ProtectedRoute>

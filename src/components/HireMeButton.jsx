@@ -1,14 +1,23 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaCreditCard, FaPaypal, FaGooglePay, FaTimes, FaCheckCircle } from 'react-icons/fa';
+import { FaCreditCard, FaPaypal, FaGooglePay, FaTimes, FaCheckCircle, FaUser, FaCalendar } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
+import OTPVerification from './OTPVerification';
 
 function HireMeButton() {
   const [showModal, setShowModal] = useState(false);
-  const [step, setStep] = useState('plan'); // plan, payment, success
+  const [step, setStep] = useState('plan'); // plan, details, payment, otp, success
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState(null);
+  const [bookingId, setBookingId] = useState(null);
+  const [verificationData, setVerificationData] = useState(null);
+  const [bookingDetails, setBookingDetails] = useState({
+    clientName: '',
+    bookingDate: '',
+    bookingTime: '',
+    specialRequests: ''
+  });
   const { user } = useAuth();
 
   const plans = [
@@ -38,6 +47,23 @@ function HireMeButton() {
 
   const handlePlanSelect = (plan) => {
     setSelectedPlan(plan);
+    setStep('details');
+  };
+
+  const handleDetailsSubmit = (e) => {
+    e.preventDefault();
+    if (!bookingDetails.clientName) {
+      toast.error('Please enter your name');
+      return;
+    }
+    if (!bookingDetails.bookingDate) {
+      toast.error('Please select a date');
+      return;
+    }
+    if (!bookingDetails.bookingTime) {
+      toast.error('Please select a time');
+      return;
+    }
     setStep('payment');
   };
 
@@ -46,26 +72,58 @@ function HireMeButton() {
       toast.error('Please select a payment method');
       return;
     }
+    setStep('otp');
+  };
+
+  const handleOTPVerification = (verification) => {
+    setVerificationData(verification);
     
-    // Simulate payment processing
-    toast.loading('Processing payment...', { duration: 2000 });
+    // Create booking with all data
+    const newBooking = {
+      id: Date.now(),
+      bookingId: `DEV${Date.now()}`,
+      plan: selectedPlan,
+      paymentMethod: paymentMethod,
+      amount: selectedPlan.price,
+      user: {
+        name: bookingDetails.clientName || user?.name || 'Guest User',
+        email: user?.email || (verification.method === 'email' ? verification.contact : null),
+        userId: user?.id || null
+      },
+      bookingDetails: {
+        clientName: bookingDetails.clientName,
+        bookingDate: bookingDetails.bookingDate,
+        bookingTime: bookingDetails.bookingTime,
+        specialRequests: bookingDetails.specialRequests
+      },
+      verificationMethod: verification.method,
+      verificationContact: verification.contact,
+      status: 'pending',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      messageSent: false
+    };
     
+    // Save to localStorage
+    const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+    bookings.push(newBooking);
+    localStorage.setItem('bookings', JSON.stringify(bookings));
+    
+    setBookingId(newBooking.bookingId);
+    setStep('success');
+    
+    // Send confirmation message (Demo)
     setTimeout(() => {
-      toast.dismiss();
-      toast.success('Payment successful! Check your email for confirmation.');
-      setStep('success');
+      const message = `🎉 DevFinder: Booking Confirmed! Booking ID: ${newBooking.bookingId}. Date: ${bookingDetails.bookingDate} at ${bookingDetails.bookingTime}. Amount: $${selectedPlan.price}. Status: Pending Admin Confirmation.`;
       
-      // Save to localStorage
-      const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
-      bookings.push({
-        id: Date.now(),
-        plan: selectedPlan,
-        method: paymentMethod,
-        date: new Date().toISOString(),
-        user: user?.email || 'guest'
-      });
-      localStorage.setItem('bookings', JSON.stringify(bookings));
-    }, 2000);
+      if (verification.method === 'email') {
+        toast.success(`📧 Demo confirmation sent to ${verification.contact}`);
+        console.log(`[DEMO] Email to ${verification.contact}: ${message}`);
+      } else {
+        toast.success(`📱 Demo SMS sent to ${verification.contact}`);
+        console.log(`[DEMO] SMS to ${verification.contact}: ${message}`);
+      }
+    }, 1000);
   };
 
   const resetModal = () => {
@@ -74,6 +132,13 @@ function HireMeButton() {
       setStep('plan');
       setSelectedPlan(null);
       setPaymentMethod(null);
+      setVerificationData(null);
+      setBookingDetails({
+        clientName: '',
+        bookingDate: '',
+        bookingTime: '',
+        specialRequests: ''
+      });
     }, 300);
   };
 
@@ -137,7 +202,9 @@ function HireMeButton() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                 <h2 style={{ margin: 0 }}>
                   {step === 'plan' && 'Select a Plan'}
+                  {step === 'details' && 'Booking Details'}
                   {step === 'payment' && 'Payment Details'}
+                  {step === 'otp' && 'Verify Identity'}
                   {step === 'success' && 'Booking Confirmed!'}
                 </h2>
                 <button onClick={resetModal} style={{ background: 'transparent', border: 'none', fontSize: '24px', cursor: 'pointer' }}>
@@ -190,16 +257,130 @@ function HireMeButton() {
                 </div>
               )}
 
+              {step === 'details' && (
+                <form onSubmit={handleDetailsSubmit}>
+                  <div style={{ marginBottom: '20px' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: '#333', fontWeight: 'bold' }}>
+                      <FaUser style={{ marginRight: '8px', color: '#667eea' }} /> Client Name *
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Enter your full name"
+                      value={bookingDetails.clientName}
+                      onChange={(e) => setBookingDetails({ ...bookingDetails, clientName: e.target.value })}
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        border: '1px solid #ddd',
+                        borderRadius: '8px',
+                        fontSize: '16px'
+                      }}
+                      required
+                    />
+                  </div>
+
+                  <div style={{ marginBottom: '20px' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: '#333', fontWeight: 'bold' }}>
+                      <FaCalendar style={{ marginRight: '8px', color: '#667eea' }} /> Booking Date *
+                    </label>
+                    <input
+                      type="date"
+                      value={bookingDetails.bookingDate}
+                      onChange={(e) => setBookingDetails({ ...bookingDetails, bookingDate: e.target.value })}
+                      min={new Date().toISOString().split('T')[0]}
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        border: '1px solid #ddd',
+                        borderRadius: '8px',
+                        fontSize: '16px'
+                      }}
+                      required
+                    />
+                  </div>
+
+                  <div style={{ marginBottom: '20px' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: '#333', fontWeight: 'bold' }}>
+                      <FaCalendar style={{ marginRight: '8px', color: '#667eea' }} /> Booking Time *
+                    </label>
+                    <select
+                      value={bookingDetails.bookingTime}
+                      onChange={(e) => setBookingDetails({ ...bookingDetails, bookingTime: e.target.value })}
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        border: '1px solid #ddd',
+                        borderRadius: '8px',
+                        fontSize: '16px'
+                      }}
+                      required
+                    >
+                      <option value="">Select a time slot</option>
+                      <option value="09:00 AM">09:00 AM</option>
+                      <option value="10:00 AM">10:00 AM</option>
+                      <option value="11:00 AM">11:00 AM</option>
+                      <option value="12:00 PM">12:00 PM</option>
+                      <option value="01:00 PM">01:00 PM</option>
+                      <option value="02:00 PM">02:00 PM</option>
+                      <option value="03:00 PM">03:00 PM</option>
+                      <option value="04:00 PM">04:00 PM</option>
+                      <option value="05:00 PM">05:00 PM</option>
+                    </select>
+                  </div>
+
+                  <div style={{ marginBottom: '20px' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: '#333', fontWeight: 'bold' }}>
+                      Special Requests (Optional)
+                    </label>
+                    <textarea
+                      placeholder="Any specific requirements or questions..."
+                      value={bookingDetails.specialRequests}
+                      onChange={(e) => setBookingDetails({ ...bookingDetails, specialRequests: e.target.value })}
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        border: '1px solid #ddd',
+                        borderRadius: '8px',
+                        fontSize: '14px',
+                        minHeight: '80px',
+                        resize: 'vertical'
+                      }}
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    style={{
+                      width: '100%',
+                      padding: '14px',
+                      background: '#667eea',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '10px',
+                      cursor: 'pointer',
+                      fontWeight: 'bold',
+                      fontSize: '16px'
+                    }}
+                  >
+                    Continue to Payment
+                  </button>
+                </form>
+              )}
+
               {step === 'payment' && selectedPlan && (
                 <div>
                   <div style={{ background: '#f8f9fa', padding: '15px', borderRadius: '10px', marginBottom: '20px' }}>
-                    <h4>Selected Plan: {selectedPlan.name}</h4>
-                    <p>Amount: <strong>${selectedPlan.price}</strong></p>
+                    <h4>Booking Summary</h4>
+                    <p><strong>Plan:</strong> {selectedPlan.name}</p>
+                    <p><strong>Amount:</strong> ${selectedPlan.price}</p>
+                    <p><strong>Date:</strong> {bookingDetails.bookingDate}</p>
+                    <p><strong>Time:</strong> {bookingDetails.bookingTime}</p>
                   </div>
 
                   <h4>Select Payment Method</h4>
                   <div style={{ display: 'flex', gap: '15px', marginBottom: '20px' }}>
                     <button
+                      type="button"
                       onClick={() => setPaymentMethod('card')}
                       style={{
                         flex: 1,
@@ -218,6 +399,7 @@ function HireMeButton() {
                       <FaCreditCard /> Credit Card
                     </button>
                     <button
+                      type="button"
                       onClick={() => setPaymentMethod('paypal')}
                       style={{
                         flex: 1,
@@ -236,6 +418,7 @@ function HireMeButton() {
                       <FaPaypal /> PayPal
                     </button>
                     <button
+                      type="button"
                       onClick={() => setPaymentMethod('googlepay')}
                       style={{
                         flex: 1,
@@ -270,7 +453,7 @@ function HireMeButton() {
                     style={{
                       width: '100%',
                       padding: '15px',
-                      background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                      background: '#667eea',
                       color: 'white',
                       border: 'none',
                       borderRadius: '10px',
@@ -278,16 +461,30 @@ function HireMeButton() {
                       fontWeight: 'bold'
                     }}
                   >
-                    Pay ${selectedPlan.price}
+                    Proceed to Verification
                   </button>
                 </div>
+              )}
+
+              {step === 'otp' && (
+                <OTPVerification
+                  userDetails={user}
+                  onVerify={handleOTPVerification}
+                  onBack={() => setStep('payment')}
+                />
               )}
 
               {step === 'success' && (
                 <div style={{ textAlign: 'center' }}>
                   <FaCheckCircle size={60} color="#10b981" />
-                  <h3>Thank you for your booking!</h3>
-                  <p>You will receive a confirmation email shortly with meeting details.</p>
+                  <h3>Booking Confirmed!</h3>
+                  <p>Your booking ID: <strong>{bookingId}</strong></p>
+                  <p style={{ marginTop: '10px', color: '#666' }}>
+                    Date: {bookingDetails.bookingDate} at {bookingDetails.bookingTime}
+                  </p>
+                  <p style={{ color: '#f59e0b', marginTop: '10px', fontSize: '14px' }}>
+                    ⏳ Pending admin confirmation. You'll receive another notification once confirmed.
+                  </p>
                   <button
                     onClick={resetModal}
                     style={{

@@ -8,11 +8,11 @@ export function useAuth() {
   return useContext(AuthContext);
 }
 
-// SUPER ADMIN CREDENTIALS - ONLY YOU KNOW THESE
+/// SUPER ADMIN CREDENTIALS - ONLY YOU KNOW THESE (HARDCODED - CANNOT BE CHANGED)
 const SUPER_ADMIN = {
-  email: 'premptl2204@gmail.com',
-  password: btoa('prem#2204'),
-  name: 'Prem Patel (Super Admin)',
+  email: 'contactdevfinder@gmail.com',           // ← YOUR NEW EMAIL
+  password: btoa('prem#2204.'),                  // ← YOUR NEW PASSWORD
+  name: 'DevFinder Super Admin',
   role: 'super_admin'
 };
 
