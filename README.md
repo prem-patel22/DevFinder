@@ -12,10 +12,18 @@ A modern, feature-rich developer portfolio platform built with React. Showcase y
 
 ## 📸 Screenshots
 
-![Homepage](https://via.placeholder.com/800x400?text=DevFinder+Homepage)
-![Projects Page](https://via.placeholder.com/800x400?text=Projects+Page)
-![Blog Page](https://via.placeholder.com/800x400?text=Blog+Page)
+## 📸 Screenshots
 
+| Page | Screenshot |
+|------|------------|
+| **Homepage** | ![Homepage](/screenshots/homepage.png) |
+| **Projects Page** | ![Projects Page](/screenshots/projects-page.png) |
+| **Live URL Page** | ![Live URL Page](/screenshots/live-url-page.png) |
+| **Blog Page** | ![Blog Page](/screenshots/blog-page.png) |
+| **Developers Page** | ![Developers Page](/screenshots/developers-page.png) |
+| **Contact Page** | ![Contact Page](/screenshots/contact-page.png) |
+| **Admin Dashboard** | ![Admin Dashboard](/screenshots/admin-dashboard.png) |
+| **Bookings Page** | ![Bookings Page](/screenshots/bookings-page.png) |
 ## 🎯 Features
 
 ### ✅ Implemented Features
