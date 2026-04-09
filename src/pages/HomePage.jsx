@@ -1,21 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { FaCode, FaUsers, FaRocket, FaArrowRight } from 'react-icons/fa';
 import ThreeDGlobe from '../components/ThreeDGlobe';
+import ChatWidget from '../components/ChatWidget';
 
 // Enhanced Typing animation component
 function TypingAnimation() {
+  const { t } = useTranslation();
   const [text, setText] = useState('');
   const [index, setIndex] = useState(0);
   const [wordIndex, setWordIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
   
   const words = [
-    "Full Stack Developer 💻",
-    "AI/ML Enthusiast 🤖",
-    "Photographer 📸",
-    "Problem Solver 🎯",
-    "Open Source Contributor 🌟"
+    t('typing.dev1'),
+    t('typing.dev2'),
+    t('typing.dev3'),
+    t('typing.dev4'),
+    t('typing.dev5')
   ];
   
   useEffect(() => {
@@ -39,7 +42,7 @@ function TypingAnimation() {
       setIsDeleting(false);
       setWordIndex(prev => (prev + 1) % words.length);
     }
-  }, [index, wordIndex, isDeleting]);
+  }, [index, wordIndex, isDeleting, t]);
   
   return (
     <h2 style={{
@@ -63,6 +66,8 @@ function TypingAnimation() {
 }
 
 function HomePage() {
+  const { t } = useTranslation();
+  
   const fadeInUp = {
     hidden: { opacity: 0, y: 60 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
@@ -154,7 +159,7 @@ function HomePage() {
               fontWeight: 'bold'
             }}
           >
-            Find Your Perfect Dev Match
+            {t('hero.title')}
           </motion.h1>
           
           {/* Enhanced Typing Animation Component */}
@@ -171,8 +176,7 @@ function HomePage() {
               lineHeight: '1.6'
             }}
           >
-            Connect with talented developers, showcase your projects, 
-            and build amazing things together
+            {t('hero.subtitle')}
           </motion.p>
 
           <motion.div
@@ -191,7 +195,7 @@ function HomePage() {
               fontWeight: 'bold',
               boxShadow: '0 4px 15px rgba(0,0,0,0.2)'
             }}>
-              Get Started <FaArrowRight style={{ marginLeft: '10px' }} />
+              {t('hero.button')} <FaArrowRight style={{ marginLeft: '10px' }} />
             </button>
           </motion.div>
         </motion.div>
@@ -228,7 +232,7 @@ function HomePage() {
             color: '#333'
           }}
         >
-          Why Choose DevFinder?
+          {t('features.title')}
         </motion.h2>
 
         <div style={{
@@ -254,10 +258,8 @@ function HomePage() {
             >
               <FaCode />
             </motion.div>
-            <h3 style={{ marginBottom: '15px', color: '#333' }}>Showcase Your Skills</h3>
-            <p style={{ color: '#666', lineHeight: '1.6' }}>
-              Create your developer profile and highlight your best projects
-            </p>
+            <h3 style={{ marginBottom: '15px', color: '#333' }}>{t('features.skills')}</h3>
+            <p style={{ color: '#666', lineHeight: '1.6' }}>{t('features.skills.desc')}</p>
           </motion.div>
 
           <motion.div 
@@ -278,10 +280,8 @@ function HomePage() {
             >
               <FaUsers />
             </motion.div>
-            <h3 style={{ marginBottom: '15px', color: '#333' }}>Connect & Collaborate</h3>
-            <p style={{ color: '#666', lineHeight: '1.6' }}>
-              Network with developers worldwide and find collaboration opportunities
-            </p>
+            <h3 style={{ marginBottom: '15px', color: '#333' }}>{t('features.connect')}</h3>
+            <p style={{ color: '#666', lineHeight: '1.6' }}>{t('features.connect.desc')}</p>
           </motion.div>
 
           <motion.div 
@@ -302,10 +302,8 @@ function HomePage() {
             >
               <FaRocket />
             </motion.div>
-            <h3 style={{ marginBottom: '15px', color: '#333' }}>Grow Together</h3>
-            <p style={{ color: '#666', lineHeight: '1.6' }}>
-              Learn from others, get feedback, and accelerate your career
-            </p>
+            <h3 style={{ marginBottom: '15px', color: '#333' }}>{t('features.grow')}</h3>
+            <p style={{ color: '#666', lineHeight: '1.6' }}>{t('features.grow.desc')}</p>
           </motion.div>
         </div>
       </motion.section>
@@ -335,7 +333,7 @@ function HomePage() {
             transition={{ type: "spring", stiffness: 260, damping: 20 }}
           >
             <h2 style={{ fontSize: '3rem', marginBottom: '10px' }}>1000+</h2>
-            <p>Active Developers</p>
+            <p>{t('stats.developers')}</p>
           </motion.div>
           
           <motion.div
@@ -344,7 +342,7 @@ function HomePage() {
             transition={{ type: "spring", stiffness: 260, damping: 20, delay: 0.2 }}
           >
             <h2 style={{ fontSize: '3rem', marginBottom: '10px' }}>500+</h2>
-            <p>Projects Shared</p>
+            <p>{t('stats.projects')}</p>
           </motion.div>
           
           <motion.div
@@ -353,7 +351,7 @@ function HomePage() {
             transition={{ type: "spring", stiffness: 260, damping: 20, delay: 0.4 }}
           >
             <h2 style={{ fontSize: '3rem', marginBottom: '10px' }}>50+</h2>
-            <p>Companies Trust Us</p>
+            <p>{t('stats.companies')}</p>
           </motion.div>
         </div>
       </motion.section>
@@ -378,7 +376,7 @@ function HomePage() {
             color: '#333'
           }}
         >
-          Ready to Showcase Your Work?
+          {t('cta.title')}
         </motion.h2>
         
         <motion.p 
@@ -389,7 +387,7 @@ function HomePage() {
             color: '#666'
           }}
         >
-          Join thousands of developers who are already sharing their projects
+          {t('cta.subtitle')}
         </motion.p>
         
         <motion.button
@@ -407,9 +405,12 @@ function HomePage() {
             fontWeight: 'bold'
           }}
         >
-          Join Now - It's Free!
+          {t('cta.button')}
         </motion.button>
       </motion.section>
+
+      {/* Chat Widget */}
+      <ChatWidget />
     </div>
   );
 }

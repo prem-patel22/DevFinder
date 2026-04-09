@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { FaUser, FaEnvelope, FaComment, FaPaperPlane, FaCheckCircle } from 'react-icons/fa';
 import toast, { Toaster } from 'react-hot-toast';
+import HireMeButton from '../components/HireMeButton';
 
 function ContactPage() {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -23,18 +26,15 @@ function ContactPage() {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate email sending (replace with actual EmailJS integration)
     await new Promise(resolve => setTimeout(resolve, 1500));
     
     console.log('Form submitted:', formData);
     setIsSubmitting(false);
     setIsSubmitted(true);
-    toast.success('Message sent successfully! I\'ll get back to you soon.');
+    toast.success(t('contact.success'));
     
-    // Reset form
     setFormData({ name: '', email: '', message: '' });
     
-    // Reset success message after 5 seconds
     setTimeout(() => setIsSubmitted(false), 5000);
   };
 
@@ -69,13 +69,42 @@ function ContactPage() {
             textAlign: 'center',
             color: 'white'
           }}>
-            <h1 style={{ fontSize: '2.5rem', marginBottom: '10px' }}>📧 Get in Touch</h1>
-            <p style={{ fontSize: '1.1rem', opacity: 0.95 }}>
-              Have a project in mind? Let's collaborate!
-            </p>
+            <h1 style={{ fontSize: '2.5rem', marginBottom: '10px' }}>{t('contact.title')}</h1>
+            <p style={{ fontSize: '1.1rem', opacity: 0.95 }}>{t('contact.subtitle')}</p>
           </div>
 
           <div style={{ padding: '40px' }}>
+            {/* Hire Me Button Section */}
+            <div style={{ 
+              textAlign: 'center', 
+              marginBottom: '30px',
+              padding: '20px',
+              background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
+              borderRadius: '15px'
+            }}>
+              <h3 style={{ color: '#d97706', marginBottom: '10px' }}>💼 Want to hire me?</h3>
+              <p style={{ color: '#92400e', marginBottom: '15px' }}>Click below to check my consultation packages</p>
+              <HireMeButton />
+            </div>
+
+            {/* Divider */}
+            <div style={{ 
+              textAlign: 'center', 
+              margin: '20px 0',
+              position: 'relative',
+              borderBottom: '1px solid #eee'
+            }}>
+              <span style={{ 
+                background: 'white', 
+                padding: '0 10px', 
+                color: '#999',
+                position: 'relative',
+                top: '10px'
+              }}>
+                OR
+              </span>
+            </div>
+
             {!isSubmitted ? (
               <form onSubmit={handleSubmit}>
                 <div style={{ marginBottom: '25px' }}>
@@ -86,7 +115,7 @@ function ContactPage() {
                     fontWeight: 'bold'
                   }}>
                     <FaUser style={{ marginRight: '8px', color: '#667eea' }} />
-                    Name *
+                    {t('contact.name')} *
                   </label>
                   <input
                     type="text"
@@ -115,7 +144,7 @@ function ContactPage() {
                     fontWeight: 'bold'
                   }}>
                     <FaEnvelope style={{ marginRight: '8px', color: '#667eea' }} />
-                    Email *
+                    {t('contact.email')} *
                   </label>
                   <input
                     type="email"
@@ -141,7 +170,7 @@ function ContactPage() {
                     fontWeight: 'bold'
                   }}>
                     <FaComment style={{ marginRight: '8px', color: '#667eea' }} />
-                    Message *
+                    {t('contact.message')} *
                   </label>
                   <textarea
                     name="message"
@@ -182,9 +211,9 @@ function ContactPage() {
                     gap: '10px'
                   }}
                 >
-                  {isSubmitting ? 'Sending...' : (
+                  {isSubmitting ? t('contact.sending') : (
                     <>
-                      Send Message <FaPaperPlane />
+                      {t('contact.send')} <FaPaperPlane />
                     </>
                   )}
                 </motion.button>
@@ -199,7 +228,7 @@ function ContactPage() {
                 }}
               >
                 <FaCheckCircle style={{ fontSize: '60px', color: '#10b981', marginBottom: '20px' }} />
-                <h2 style={{ color: '#333', marginBottom: '10px' }}>Message Sent! 🎉</h2>
+                <h2 style={{ color: '#333', marginBottom: '10px' }}>{t('contact.success')} 🎉</h2>
                 <p style={{ color: '#666' }}>
                   Thanks for reaching out! I'll get back to you within 24-48 hours.
                 </p>

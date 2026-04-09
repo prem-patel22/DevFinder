@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { FaGithub, FaExternalLinkAlt, FaSearch, FaFilter, FaBrain, FaBook, FaPlane, FaTasks, FaChartLine, FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import { EditProjectModal } from '../components/EditModals';
@@ -134,6 +135,7 @@ const getIcon = (iconName) => {
 };
 
 function ProjectsPage() {
+  const { t } = useTranslation();
   const { isAdmin, getAllProjects, addProject, updateProject, deleteProject } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -234,11 +236,10 @@ function ProjectsPage() {
                 marginBottom: '15px'
               }}
             >
-              My GitHub Projects
+              {t('projects.title')}
             </motion.h1>
             <p style={{ fontSize: '1.2rem', color: '#666', maxWidth: '700px' }}>
-              🚀 {projects.length} innovative projects showcasing my expertise in full-stack development, 
-              AI/ML, and modern web technologies
+              🚀 {projects.length} {t('projects.subtitle')}
             </p>
           </motion.div>
           
@@ -286,7 +287,7 @@ function ProjectsPage() {
             boxShadow: '0 5px 15px rgba(0,0,0,0.1)'
           }}>
             <h3 style={{ fontSize: '2rem', color: '#667eea' }}>{projects.length}</h3>
-            <p style={{ color: '#666' }}>Total Projects</p>
+            <p style={{ color: '#666' }}>{t('projects.total')}</p>
           </div>
           <div style={{
             background: 'white',
@@ -296,7 +297,7 @@ function ProjectsPage() {
             boxShadow: '0 5px 15px rgba(0,0,0,0.1)'
           }}>
             <h3 style={{ fontSize: '2rem', color: '#667eea' }}>6+</h3>
-            <p style={{ color: '#666' }}>Technologies Used</p>
+            <p style={{ color: '#666' }}>{t('projects.techUsed')}</p>
           </div>
           <div style={{
             background: 'white',
@@ -306,7 +307,7 @@ function ProjectsPage() {
             boxShadow: '0 5px 15px rgba(0,0,0,0.1)'
           }}>
             <h3 style={{ fontSize: '2rem', color: '#667eea' }}>100%</h3>
-            <p style={{ color: '#666' }}>Open Source</p>
+            <p style={{ color: '#666' }}>{t('projects.openSource')}</p>
           </div>
         </motion.div>
 
@@ -318,7 +319,7 @@ function ProjectsPage() {
           style={{ marginBottom: '60px' }}
         >
           <h2 style={{ textAlign: 'center', marginBottom: '30px', color: '#333' }}>
-            🌟 Featured 3D Projects
+            {t('projects.featured3d')}
           </h2>
           <div style={{
             display: 'grid',
@@ -364,7 +365,7 @@ function ProjectsPage() {
             <FaSearch style={{ color: '#999', marginRight: '10px' }} />
             <input
               type="text"
-              placeholder="Search by title, description, or technology..."
+              placeholder={t('projects.search')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               style={{
@@ -475,7 +476,7 @@ function ProjectsPage() {
                 </div>
                 <div style={{ display: 'flex', gap: '15px' }}>
                   <a href={project.githubLink} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#333', textDecoration: 'none' }}>
-                    <FaGithub /> GitHub
+                    <FaGithub /> {t('projects.viewCode')}
                   </a>
                 </div>
               </div>
@@ -497,7 +498,7 @@ function ProjectsPage() {
             }}
           >
             <p style={{ fontSize: '1.2rem', color: '#999' }}>
-              No projects found. Try adjusting your search or filter!
+              {t('projects.noResults')}
             </p>
           </motion.div>
         )}
@@ -516,9 +517,9 @@ function ProjectsPage() {
             boxShadow: '0 5px 15px rgba(0,0,0,0.1)'
           }}
         >
-          <h3 style={{ color: '#333', marginBottom: '10px' }}>🚀 Let's Connect!</h3>
+          <h3 style={{ color: '#333', marginBottom: '10px' }}>🚀 {t('footer.connect')}</h3>
           <p style={{ color: '#666', marginBottom: '15px' }}>
-            All projects are open source! Feel free to ⭐ star them on GitHub and contribute!
+            {t('footer.allOpenSource')}
           </p>
           <a
             href="https://github.com/prem-patel22"
@@ -535,7 +536,7 @@ function ProjectsPage() {
               borderRadius: '25px'
             }}
           >
-            <FaGithub /> Visit My GitHub Profile
+            <FaGithub /> {t('footer.visitGitHub')}
           </a>
         </motion.div>
       </div>

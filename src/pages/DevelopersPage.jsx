@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  FaGithub, FaLinkedin, FaEnvelope, FaMapMarkerAlt, 
-  FaGraduationCap, FaCode, FaCamera, FaCoffee, FaPen,
-  FaExternalLinkAlt
-} from 'react-icons/fa';
+import { useTranslation } from 'react-i18next';
+import { FaGithub, FaLinkedin, FaEnvelope, FaMapMarkerAlt, FaGraduationCap, FaCode, FaCamera, FaCoffee, FaPen, FaExternalLinkAlt } from 'react-icons/fa';
 import GitHubActivity from '../components/GitHubActivity';
 import { useAuth } from '../context/AuthContext';
 import { EditDeveloperModal } from '../components/EditModals';
+import HireMeButton from '../components/HireMeButton';
 
 function DevelopersPage() {
+  const { t } = useTranslation();
   const { isAdmin, getDeveloperContent, updateDeveloperContent } = useAuth();
   const [showEditModal, setShowEditModal] = useState(false);
   const [content, setContent] = useState({
@@ -205,6 +204,11 @@ function DevelopersPage() {
               View My GitHub Profile
               <FaExternalLinkAlt style={{ fontSize: '0.9rem' }} />
             </motion.a>
+
+            {/* Hire Me Button - Added here below GitHub button */}
+            <div style={{ marginTop: '20px' }}>
+              <HireMeButton />
+            </div>
           </div>
 
           {/* About Me Content */}
@@ -222,7 +226,7 @@ function DevelopersPage() {
                 borderLeft: '4px solid #667eea',
                 paddingLeft: '15px'
               }}>
-                👨‍💻 About Me
+                {t('developers.about')}
               </h2>
               <div style={{
                 background: '#f8f9fa',
@@ -249,19 +253,19 @@ function DevelopersPage() {
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '15px', background: '#f8f9fa', borderRadius: '10px' }}>
                 <FaMapMarkerAlt style={{ color: '#667eea', fontSize: '1.3rem' }} />
-                <span>Nadiad, Gujarat, India</span>
+                <span>{t('developers.location')}</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '15px', background: '#f8f9fa', borderRadius: '10px' }}>
                 <FaGraduationCap style={{ color: '#667eea', fontSize: '1.3rem' }} />
-                <span>B.Tech IT, 3rd Year</span>
+                <span>{t('developers.education')}</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '15px', background: '#f8f9fa', borderRadius: '10px' }}>
                 <FaCode style={{ color: '#667eea', fontSize: '1.3rem' }} />
-                <span>Full Stack · AI/ML</span>
+                <span>{t('developers.focus')}</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '15px', background: '#f8f9fa', borderRadius: '10px' }}>
                 <FaCamera style={{ color: '#667eea', fontSize: '1.3rem' }} />
-                <span>Photography · Open Source</span>
+                <span>{t('developers.hobbies')}</span>
               </div>
             </div>
 
@@ -277,12 +281,12 @@ function DevelopersPage() {
                 borderLeft: '4px solid #667eea',
                 paddingLeft: '15px'
               }}>
-                🛠️ Tech Stack
+                {t('developers.techStack')}
               </h2>
               
               {/* Languages */}
               <div style={{ marginBottom: '25px' }}>
-                <h3 style={{ color: '#667eea', marginBottom: '15px' }}>💻 Languages</h3>
+                <h3 style={{ color: '#667eea', marginBottom: '15px' }}>{t('developers.languages')}</h3>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
                   {['C', 'C++', 'Java', 'Python', 'JavaScript', 'SQL'].map((lang, idx) => (
                     <span key={idx} style={{
@@ -301,7 +305,7 @@ function DevelopersPage() {
 
               {/* Frontend */}
               <div style={{ marginBottom: '25px' }}>
-                <h3 style={{ color: '#667eea', marginBottom: '15px' }}>🌐 Frontend</h3>
+                <h3 style={{ color: '#667eea', marginBottom: '15px' }}>{t('developers.frontend')}</h3>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
                   {['HTML5', 'CSS3', 'React', 'Bootstrap'].map((tech, idx) => (
                     <span key={idx} style={{
@@ -320,7 +324,7 @@ function DevelopersPage() {
 
               {/* Backend */}
               <div style={{ marginBottom: '25px' }}>
-                <h3 style={{ color: '#667eea', marginBottom: '15px' }}>⚙️ Backend & Frameworks</h3>
+                <h3 style={{ color: '#667eea', marginBottom: '15px' }}>{t('developers.backend')}</h3>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
                   {['Spring Boot', 'JDBC', 'REST APIs', 'Node.js'].map((tech, idx) => (
                     <span key={idx} style={{
@@ -339,7 +343,7 @@ function DevelopersPage() {
 
               {/* Database */}
               <div style={{ marginBottom: '25px' }}>
-                <h3 style={{ color: '#667eea', marginBottom: '15px' }}>🗄️ Databases</h3>
+                <h3 style={{ color: '#667eea', marginBottom: '15px' }}>{t('developers.databases')}</h3>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
                   {['MySQL', 'MongoDB'].map((db, idx) => (
                     <span key={idx} style={{
@@ -358,7 +362,7 @@ function DevelopersPage() {
 
               {/* Tools */}
               <div style={{ marginBottom: '25px' }}>
-                <h3 style={{ color: '#667eea', marginBottom: '15px' }}>🧰 Tools & IDEs</h3>
+                <h3 style={{ color: '#667eea', marginBottom: '15px' }}>{t('developers.tools')}</h3>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
                   {['Git', 'GitHub', 'VS Code', 'IntelliJ IDEA'].map((tool, idx) => (
                     <span key={idx} style={{
@@ -391,7 +395,7 @@ function DevelopersPage() {
                 borderLeft: '4px solid #667eea',
                 paddingLeft: '15px'
               }}>
-                📚 Currently Leveling Up
+                {t('developers.learning')}
               </h2>
               <div style={{
                 display: 'grid',
@@ -443,7 +447,7 @@ function DevelopersPage() {
                 borderLeft: '4px solid #667eea',
                 paddingLeft: '15px'
               }}>
-                🚀 Current Projects
+                {t('developers.projects')}
               </h2>
               <div style={{
                 background: '#f8f9fa',
@@ -469,7 +473,7 @@ function DevelopersPage() {
                       <td style={{ padding: '10px' }}>Python · Scikit-learn</td>
                       <td style={{ padding: '10px' }}>📚 Learning</td>
                     </tr>
-                    <tr>
+                    <tr style={{ borderBottom: '1px solid #ddd' }}>
                       <td style={{ padding: '10px' }}>🔗 REST API with Spring Boot</td>
                       <td style={{ padding: '10px' }}>Java · Spring Boot · MySQL</td>
                       <td style={{ padding: '10px' }}>🔨 In Progress</td>
@@ -491,7 +495,7 @@ function DevelopersPage() {
                 borderLeft: '4px solid #667eea',
                 paddingLeft: '15px'
               }}>
-                🤝 Let's Connect
+                {t('developers.connect')}
               </h2>
               <div style={{
                 display: 'flex',
@@ -578,7 +582,7 @@ function DevelopersPage() {
                 {content.funFact}
               </p>
               <p style={{ color: '#667eea', marginTop: '10px', fontSize: '0.9rem' }}>
-                ⭐ If you like what you see, consider starring a repo or two! | Made with ❤️ from Gujarat, India
+                {t('developers.star')}
               </p>
             </motion.div>
           </div>

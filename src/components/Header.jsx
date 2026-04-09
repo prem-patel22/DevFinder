@@ -2,11 +2,14 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { FaGithub, FaBars, FaTimes, FaDownload, FaFilePdf, FaChevronDown, FaUser, FaUserShield, FaCrown } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import VisitorCounter from './VisitorCounter';
 import { useAuth } from '../context/AuthContext';
 import LoginModal from './LoginModal';
+import LanguageSwitcher from './LanguageSwitcher';
 
 function Header() {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
@@ -14,12 +17,12 @@ function Header() {
   const { user, logout, isSuperAdmin, isAdmin } = useAuth();
 
   const navLinks = [
-    { path: '/', name: 'Home' },
-    { path: '/projects', name: 'Projects' },
-    { path: '/live-url', name: 'Live URL' },
-    { path: '/blog', name: 'Blog' },
-    { path: '/developers', name: 'Developers' },
-    { path: '/contact', name: 'Contact' }
+    { path: '/', name: t('nav.home') },
+    { path: '/projects', name: t('nav.projects') },
+    { path: '/live-url', name: t('nav.liveUrl') },
+    { path: '/blog', name: t('nav.blog') },
+    { path: '/developers', name: t('nav.developers') },
+    { path: '/contact', name: t('nav.contact') }
   ];
 
   const downloadOptions = [
@@ -53,7 +56,6 @@ function Header() {
     setIsDropdownOpen(false);
   };
 
-  // Get role badge style and icon
   const getRoleBadge = () => {
     if (isSuperAdmin()) {
       return {
@@ -164,7 +166,7 @@ function Header() {
                 cursor: 'pointer'
               }}
             >
-              <FaDownload /> Downloads <FaChevronDown style={{ fontSize: '10px' }} />
+              <FaDownload /> {t('nav.downloads')} <FaChevronDown style={{ fontSize: '10px' }} />
             </motion.button>
 
             <AnimatePresence>
@@ -216,6 +218,9 @@ function Header() {
             </AnimatePresence>
           </div>
 
+          {/* Language Switcher */}
+          <LanguageSwitcher />
+
           {!user ? (
             <motion.button
               whileHover={{ scale: 1.05 }}
@@ -235,7 +240,7 @@ function Header() {
                 fontWeight: 'bold'
               }}
             >
-              <FaUser /> Login
+              <FaUser /> {t('nav.login')}
             </motion.button>
           ) : (
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -260,7 +265,7 @@ function Header() {
               </div>
               {isAdmin() && (
                 <Link to="/admin" style={{ color: '#667eea', textDecoration: 'none', fontSize: '14px', fontWeight: 'bold' }}>
-                  Dashboard
+                  {t('nav.dashboard')}
                 </Link>
               )}
               <motion.button
@@ -278,7 +283,7 @@ function Header() {
                   fontWeight: 'bold'
                 }}
               >
-                Logout
+                {t('nav.logout')}
               </motion.button>
             </div>
           )}
@@ -336,7 +341,7 @@ function Header() {
             <div style={{ padding: '10px 0' }}><VisitorCounter /></div>
             {!user ? (
               <button onClick={() => { setShowLoginModal(true); setIsOpen(false); }} style={{ padding: '10px', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
-                <FaUser /> Login
+                <FaUser /> {t('nav.login')}
               </button>
             ) : (
               <div style={{ padding: '10px', background: '#f8f9fa', borderRadius: '8px' }}>
@@ -348,8 +353,8 @@ function Header() {
                     </span>
                   )}
                 </div>
-                {isAdmin() && <Link to="/admin" style={{ display: 'block', marginBottom: '10px', color: '#667eea' }}>Dashboard</Link>}
-                <button onClick={logout} style={{ width: '100%', padding: '8px', background: '#dc3545', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>Logout</button>
+                {isAdmin() && <Link to="/admin" style={{ display: 'block', marginBottom: '10px', color: '#667eea' }}>{t('nav.dashboard')}</Link>}
+                <button onClick={logout} style={{ width: '100%', padding: '8px', background: '#dc3545', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>{t('nav.logout')}</button>
               </div>
             )}
           </motion.div>
