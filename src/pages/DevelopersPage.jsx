@@ -1,33 +1,44 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   FaGithub, FaLinkedin, FaEnvelope, FaMapMarkerAlt, 
-  FaGraduationCap, FaCode, FaCamera, FaHeart, 
-  FaLaptopCode, FaDatabase, FaCloud, FaTools,
-  FaExternalLinkAlt, FaDownload, FaUserGraduate,
-  FaReact, FaPython, FaJava, FaNodeJs, FaPhp,
-  FaBriefcase, FaGlobe, FaCoffee, FaRocket, FaStar, FaGitAlt
+  FaGraduationCap, FaCode, FaCamera, FaCoffee, FaPen,
+  FaExternalLinkAlt
 } from 'react-icons/fa';
-import { SiCplusplus, SiJavascript, SiMysql, SiSpringboot } from 'react-icons/si';
+import GitHubActivity from '../components/GitHubActivity';
+import { useAuth } from '../context/AuthContext';
+import { EditDeveloperModal } from '../components/EditModals';
 
 function DevelopersPage() {
-  // Your GitHub profile link
+  const { isAdmin, getDeveloperContent, updateDeveloperContent } = useAuth();
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [content, setContent] = useState({
+    aboutText: "I'm a 3rd year B.Tech IT student at Dharmsinh Desai University, Nadiad, Gujarat, passionate about building real-world applications that make a difference. Currently in my third year, I've developed a strong foundation in both frontend and backend technologies. My journey in tech started with curiosity about how websites work, and now I'm deeply immersed in Full Stack Development and AI/ML. I love the challenge of solving complex problems and creating elegant solutions.",
+    bio: "When I'm not coding, you'll find me with my camera capturing moments, contributing to open source, or enjoying a cup of chai while debugging ☕.",
+    skills: ["C", "C++", "Java", "Python", "JavaScript", "SQL", "React", "Spring Boot", "Node.js", "MongoDB", "MySQL", "Git", "GitHub"],
+    funFact: "I debug best with a cup of chai ☕ - it's my secret superpower!"
+  });
+
+  useEffect(() => {
+    const savedContent = getDeveloperContent();
+    if (savedContent) {
+      setContent(savedContent);
+    }
+  }, []);
+
+  const handleUpdateContent = (newContent) => {
+    if (updateDeveloperContent(newContent)) {
+      setContent(newContent);
+      setShowEditModal(false);
+    }
+  };
+
   const githubProfile = "https://github.com/prem-patel22";
-  
-  // Your Image URL - Replace with your actual image URL
   const profileImage = "https://avatars.githubusercontent.com/prem-patel22";
   
   const fadeInUp = {
     hidden: { opacity: 0, y: 30 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
-  };
-
-  const staggerContainer = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1 }
-    }
   };
 
   return (
@@ -37,8 +48,6 @@ function DevelopersPage() {
       padding: '60px 20px'
     }}>
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-        
-        {/* Main Card */}
         <motion.div
           initial="hidden"
           animate="visible"
@@ -50,8 +59,7 @@ function DevelopersPage() {
             boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
           }}
         >
-          
-          {/* Profile Header with Gradient */}
+          {/* Profile Header with Gradient and Edit Pen */}
           <div style={{
             background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
             padding: '60px 40px 40px 40px',
@@ -72,6 +80,30 @@ function DevelopersPage() {
                 right: '-50px'
               }}
             />
+            
+            {/* Edit Pen Icon - Only visible to Admin */}
+            {isAdmin() && (
+              <button 
+                onClick={() => setShowEditModal(true)} 
+                style={{ 
+                  position: 'absolute', 
+                  top: '20px', 
+                  right: '20px', 
+                  background: 'white', 
+                  border: 'none', 
+                  padding: '12px', 
+                  borderRadius: '50%', 
+                  cursor: 'pointer', 
+                  boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
+                  zIndex: 10,
+                  transition: 'transform 0.2s'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+              >
+                <FaPen style={{ color: '#667eea', fontSize: '1.2rem' }} />
+              </button>
+            )}
             
             {/* Profile Image with GitHub link */}
             <motion.a
@@ -200,235 +232,38 @@ function DevelopersPage() {
                 color: '#555'
               }}>
                 <p style={{ marginBottom: '15px', fontSize: '1.05rem' }}>
-                  I'm a <strong>3rd year B.Tech IT student at Dharmsinh Desai University, Nadiad, Gujarat</strong>, 
-                  passionate about building real-world applications that make a difference. Currently in my third year, 
-                  I've developed a strong foundation in both frontend and backend technologies.
-                </p>
-                <p style={{ marginBottom: '15px', fontSize: '1.05rem' }}>
-                  My journey in tech started with curiosity about how websites work, and now I'm deeply 
-                  immersed in <strong>Full Stack Development and AI/ML</strong>. I love the challenge of solving 
-                  complex problems and creating elegant solutions.
+                  {content.aboutText}
                 </p>
                 <p style={{ fontSize: '1.05rem' }}>
-                  When I'm not coding, you'll find me with my camera capturing moments, contributing to 
-                  open source, or enjoying a cup of chai while debugging ☕.
+                  {content.bio}
                 </p>
               </div>
             </motion.section>
 
             {/* Quick Info Grid */}
-            <motion.div
-              variants={staggerContainer}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-                gap: '20px',
-                marginBottom: '40px'
-              }}
-            >
-              <motion.div variants={fadeInUp} style={{
-                background: 'white',
-                padding: '20px',
-                borderRadius: '15px',
-                boxShadow: '0 5px 15px rgba(0,0,0,0.1)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '15px'
-              }}>
-                <FaMapMarkerAlt style={{ color: '#667eea', fontSize: '2rem' }} />
-                <div>
-                  <h4 style={{ margin: 0, color: '#333' }}>Location</h4>
-                  <p style={{ margin: '5px 0 0', color: '#666' }}>Nadiad, Gujarat, India</p>
-                </div>
-              </motion.div>
-
-              <motion.div variants={fadeInUp} style={{
-                background: 'white',
-                padding: '20px',
-                borderRadius: '15px',
-                boxShadow: '0 5px 15px rgba(0,0,0,0.1)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '15px'
-              }}>
-                <FaGraduationCap style={{ color: '#667eea', fontSize: '2rem' }} />
-                <div>
-                  <h4 style={{ margin: 0, color: '#333' }}>Education</h4>
-                  <p style={{ margin: '5px 0 0', color: '#666' }}>B.Tech IT, 3rd Year</p>
-                </div>
-              </motion.div>
-
-              <motion.div variants={fadeInUp} style={{
-                background: 'white',
-                padding: '20px',
-                borderRadius: '15px',
-                boxShadow: '0 5px 15px rgba(0,0,0,0.1)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '15px'
-              }}>
-                <FaCode style={{ color: '#667eea', fontSize: '2rem' }} />
-                <div>
-                  <h4 style={{ margin: 0, color: '#333' }}>Focus</h4>
-                  <p style={{ margin: '5px 0 0', color: '#666' }}>Full Stack · AI/ML</p>
-                </div>
-              </motion.div>
-
-              <motion.div variants={fadeInUp} style={{
-                background: 'white',
-                padding: '20px',
-                borderRadius: '15px',
-                boxShadow: '0 5px 15px rgba(0,0,0,0.1)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '15px'
-              }}>
-                <FaCamera style={{ color: '#667eea', fontSize: '2rem' }} />
-                <div>
-                  <h4 style={{ margin: 0, color: '#333' }}>Hobbies</h4>
-                  <p style={{ margin: '5px 0 0', color: '#666' }}>Photography · Open Source</p>
-                </div>
-              </motion.div>
-            </motion.div>
-
-            {/* GitHub Stats Section - FIXED with working URLs */}
-            <motion.section
-              variants={fadeInUp}
-              style={{ marginBottom: '40px' }}
-            >
-              <h2 style={{ 
-                fontSize: '2rem', 
-                color: '#333',
-                marginBottom: '20px',
-                borderLeft: '4px solid #667eea',
-                paddingLeft: '15px'
-              }}>
-                📊 GitHub Stats
-              </h2>
-              
-              {/* Stats Cards Row */}
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                gap: '20px',
-                marginBottom: '30px'
-              }}>
-                <div style={{
-                  background: '#0D1117',
-                  padding: '20px',
-                  borderRadius: '15px',
-                  textAlign: 'center',
-                  color: 'white'
-                }}>
-                  <h3 style={{ fontSize: '2rem', color: '#39D353', margin: 0 }}>59</h3>
-                  <p style={{ margin: '5px 0 0', color: '#C9D1D9' }}>Total Contributions</p>
-                  <small style={{ color: '#8B949E' }}>Sep 18, 2025 - Present</small>
-                </div>
-                
-                <div style={{
-                  background: '#0D1117',
-                  padding: '20px',
-                  borderRadius: '15px',
-                  textAlign: 'center',
-                  color: 'white'
-                }}>
-                  <h3 style={{ fontSize: '2rem', color: '#39D353', margin: 0 }}>0</h3>
-                  <p style={{ margin: '5px 0 0', color: '#C9D1D9' }}>Current Streak</p>
-                  <small style={{ color: '#8B949E' }}>Apr 8</small>
-                </div>
-                
-                <div style={{
-                  background: '#0D1117',
-                  padding: '20px',
-                  borderRadius: '15px',
-                  textAlign: 'center',
-                  color: 'white'
-                }}>
-                  <h3 style={{ fontSize: '2rem', color: '#39D353', margin: 0 }}>5</h3>
-                  <p style={{ margin: '5px 0 0', color: '#C9D1D9' }}>Longest Streak</p>
-                  <small style={{ color: '#8B949E' }}>Oct 16, 2025 - Oct 20, 2025</small>
-                </div>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+              gap: '15px',
+              marginBottom: '40px'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '15px', background: '#f8f9fa', borderRadius: '10px' }}>
+                <FaMapMarkerAlt style={{ color: '#667eea', fontSize: '1.3rem' }} />
+                <span>Nadiad, Gujarat, India</span>
               </div>
-
-              {/* GitHub Stats Images - Using your working URLs */}
-              <div style={{
-                display: 'flex',
-                flexWrap: 'wrap',
-                justifyContent: 'center',
-                gap: '20px',
-                marginBottom: '20px'
-              }}>
-                <a href={githubProfile} target="_blank" rel="noopener noreferrer">
-                  <img 
-                    src="https://github-readme-stats-sigma-five.vercel.app/api?username=prem-patel22&show_icons=true&include_all_commits=true&count_private=true&hide_border=true&bg_color=0D1117&title_color=39D353&icon_color=39D353&text_color=C9D1D9"
-                    alt="GitHub Stats"
-                    style={{ 
-                      height: '180px', 
-                      borderRadius: '10px',
-                      boxShadow: '0 5px 15px rgba(0,0,0,0.2)'
-                    }}
-                    onError={(e) => {
-                      e.target.style.display = 'none';
-                    }}
-                  />
-                </a>
-                
-                <a href={githubProfile} target="_blank" rel="noopener noreferrer">
-                  <img 
-                    src="https://github-readme-stats-sigma-five.vercel.app/api/top-langs/?username=prem-patel22&layout=compact&hide_border=true&bg_color=0D1117&title_color=39D353&text_color=C9D1D9&langs_count=8"
-                    alt="Top Languages"
-                    style={{ 
-                      height: '180px', 
-                      borderRadius: '10px',
-                      boxShadow: '0 5px 15px rgba(0,0,0,0.2)'
-                    }}
-                    onError={(e) => {
-                      e.target.style.display = 'none';
-                    }}
-                  />
-                </a>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '15px', background: '#f8f9fa', borderRadius: '10px' }}>
+                <FaGraduationCap style={{ color: '#667eea', fontSize: '1.3rem' }} />
+                <span>B.Tech IT, 3rd Year</span>
               </div>
-
-              {/* Streak Stats */}
-              <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-                <a href={githubProfile} target="_blank" rel="noopener noreferrer">
-                  <img 
-                    src="https://streak-stats.demolab.com/?user=prem-patel22&hide_border=true&background=0D1117&ring=39D353&fire=39D353&currStreakLabel=39D353&sideLabels=C9D1D9&dates=8B949E&stroke=39D353"
-                    alt="GitHub Streak"
-                    style={{ 
-                      width: '100%', 
-                      maxWidth: '500px', 
-                      borderRadius: '10px',
-                      boxShadow: '0 5px 15px rgba(0,0,0,0.2)'
-                    }}
-                    onError={(e) => {
-                      e.target.style.display = 'none';
-                    }}
-                  />
-                </a>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '15px', background: '#f8f9fa', borderRadius: '10px' }}>
+                <FaCode style={{ color: '#667eea', fontSize: '1.3rem' }} />
+                <span>Full Stack · AI/ML</span>
               </div>
-
-              {/* Contribution Graph */}
-              <div style={{ textAlign: 'center' }}>
-                <a href={githubProfile} target="_blank" rel="noopener noreferrer">
-                  <img 
-                    src="https://github-readme-activity-graph.vercel.app/graph?username=prem-patel22&bg_color=0D1117&color=39D353&line=39D353&point=FFFFFF&hide_border=true&radius=6"
-                    alt="Contribution Graph"
-                    style={{ 
-                      width: '100%', 
-                      borderRadius: '10px',
-                      boxShadow: '0 5px 15px rgba(0,0,0,0.2)'
-                    }}
-                    onError={(e) => {
-                      e.target.style.display = 'none';
-                    }}
-                  />
-                </a>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '15px', background: '#f8f9fa', borderRadius: '10px' }}>
+                <FaCamera style={{ color: '#667eea', fontSize: '1.3rem' }} />
+                <span>Photography · Open Source</span>
               </div>
-            </motion.section>
+            </div>
 
             {/* Tech Stack Section */}
             <motion.section
@@ -540,6 +375,9 @@ function DevelopersPage() {
                 </div>
               </div>
             </motion.section>
+
+            {/* GitHub Activity Component */}
+            <GitHubActivity />
 
             {/* Currently Learning */}
             <motion.section
@@ -737,7 +575,7 @@ function DevelopersPage() {
             >
               <FaCoffee style={{ color: '#667eea', fontSize: '2rem', marginBottom: '10px' }} />
               <p style={{ color: '#555', fontStyle: 'italic', margin: 0 }}>
-                "I debug best with a cup of chai ☕ - it's my secret superpower!"
+                {content.funFact}
               </p>
               <p style={{ color: '#667eea', marginTop: '10px', fontSize: '0.9rem' }}>
                 ⭐ If you like what you see, consider starring a repo or two! | Made with ❤️ from Gujarat, India
@@ -746,6 +584,9 @@ function DevelopersPage() {
           </div>
         </motion.div>
       </div>
+
+      {/* Edit Developer Modal */}
+      {showEditModal && <EditDeveloperModal content={content} onClose={() => setShowEditModal(false)} onSave={handleUpdateContent} />}
     </div>
   );
 }

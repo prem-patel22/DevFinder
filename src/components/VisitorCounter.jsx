@@ -1,37 +1,69 @@
 import React, { useState, useEffect } from 'react';
-import { FaEye } from 'react-icons/fa';
+import { FaEye, FaUser } from 'react-icons/fa';
 
 function VisitorCounter() {
   const [visitors, setVisitors] = useState(0);
+  const [todayVisitors, setTodayVisitors] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Get or initialize visitor count
-    let count = localStorage.getItem('visitorCount');
-    if (!count) {
-      count = Math.floor(Math.random() * 1000) + 100; // Random starting number
-      localStorage.setItem('visitorCount', count);
-    }
+    const initializeVisitorCount = () => {
+      let totalCount = localStorage.getItem('totalVisitors');
+      if (!totalCount) {
+        totalCount = Math.floor(Math.random() * 500) + 100;
+        localStorage.setItem('totalVisitors', totalCount);
+      }
+      
+      const today = new Date().toDateString();
+      let todayCount = localStorage.getItem('todayVisitors');
+      let lastDate = localStorage.getItem('lastVisitDate');
+      
+      if (lastDate !== today) {
+        todayCount = 0;
+        localStorage.setItem('lastVisitDate', today);
+      }
+      
+      if (!todayCount) {
+        todayCount = 0;
+      }
+      
+      const hasVisited = sessionStorage.getItem('hasVisited');
+      if (!hasVisited) {
+        totalCount = parseInt(totalCount) + 1;
+        todayCount = parseInt(todayCount) + 1;
+        localStorage.setItem('totalVisitors', totalCount);
+        localStorage.setItem('todayVisitors', todayCount);
+        sessionStorage.setItem('hasVisited', 'true');
+      }
+      
+      setVisitors(parseInt(totalCount));
+      setTodayVisitors(parseInt(todayCount));
+      setLoading(false);
+    };
     
-    // Increment for new session
-    const hasVisited = sessionStorage.getItem('hasVisited');
-    if (!hasVisited) {
-      count = parseInt(count) + 1;
-      localStorage.setItem('visitorCount', count);
-      sessionStorage.setItem('hasVisited', 'true');
-    }
-    
-    setVisitors(count);
+    initializeVisitorCount();
   }, []);
+
+  if (loading) {
+    return <div style={{ display: 'flex', gap: '15px' }}>Loading...</div>;
+  }
 
   return (
     <div style={{
       display: 'flex',
+      gap: '15px',
       alignItems: 'center',
-      gap: '8px',
-      fontSize: '14px',
-      color: '#666'
+      background: '#f8f9fa',
+      padding: '6px 14px',
+      borderRadius: '25px',
+      fontSize: '13px'
     }}>
-      <FaEye /> {visitors.toLocaleString()} visitors
+      <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#667eea' }}>
+        <FaEye /> <strong>{visitors.toLocaleString()}</strong> <span style={{ color: '#666' }}>Total</span>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#10b981' }}>
+        <FaUser /> <strong>{todayVisitors}</strong> <span style={{ color: '#666' }}>Today</span>
+      </div>
     </div>
   );
 }

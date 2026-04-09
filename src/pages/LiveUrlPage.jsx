@@ -1,101 +1,156 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   FaExternalLinkAlt, FaRocket, FaClock, FaCheckCircle, 
-  FaGithub, FaChartLine, FaBrain, FaBook, FaPlane, FaTasks 
+  FaChartLine, FaBrain, FaBook, FaPlane, FaTasks,
+  FaEdit, FaTrash, FaPlus
 } from 'react-icons/fa';
+import { useAuth } from '../context/AuthContext';
+import { EditLiveUrlModal, AddLiveUrlModal } from '../components/EditModals';
+
+// Default live URLs (fallback if no data in localStorage)
+const defaultLiveUrls = [
+  {
+    id: 1,
+    name: "Sales Dashboard",
+    description: "Interactive sales analytics dashboard with real-time metrics, predictive analytics, and data visualization.",
+    tech: ["React", "D3.js", "Chart.js", "Python", "FastAPI"],
+    url: "https://sales-dashboard-one-chi.vercel.app/",
+    status: "live",
+    iconName: "chart",
+    statusColor: "#10b981",
+    statusText: "Live Demo Available"
+  },
+  {
+    id: 2,
+    name: "Federated Medical Imaging",
+    description: "Privacy-preserving federated learning system for medical imaging with differential privacy.",
+    tech: ["Python", "PyTorch", "Flower", "Streamlit"],
+    url: null,
+    status: "coming-soon",
+    iconName: "brain",
+    statusColor: "#f59e0b",
+    statusText: "Coming Soon"
+  },
+  {
+    id: 3,
+    name: "Library Management System",
+    description: "Comprehensive library management system with book borrowing and inventory tracking.",
+    tech: ["Java", "Spring Boot", "MySQL", "React"],
+    url: null,
+    status: "coming-soon",
+    iconName: "book",
+    statusColor: "#f59e0b",
+    statusText: "Coming Soon"
+  },
+  {
+    id: 4,
+    name: "Planora",
+    description: "Smart project management and collaboration platform.",
+    tech: ["React", "Node.js", "MongoDB", "Express"],
+    url: null,
+    status: "coming-soon",
+    iconName: "tasks",
+    statusColor: "#f59e0b",
+    statusText: "Coming Soon"
+  },
+  {
+    id: 5,
+    name: "TravelEase",
+    description: "All-in-one travel planning platform for flights, hotels, and itineraries.",
+    tech: ["React", "Python", "Django", "PostgreSQL"],
+    url: null,
+    status: "coming-soon",
+    iconName: "plane",
+    statusColor: "#f59e0b",
+    statusText: "Coming Soon"
+  },
+  {
+    id: 6,
+    name: "Travl",
+    description: "Social travel platform for sharing experiences and discovering hidden gems.",
+    tech: ["MERN Stack", "MongoDB", "Express", "React", "Node.js"],
+    url: null,
+    status: "coming-soon",
+    iconName: "plane",
+    statusColor: "#f59e0b",
+    statusText: "Coming Soon"
+  },
+  {
+    id: 7,
+    name: "Todo App",
+    description: "Feature-rich todo application with task management and progress tracking.",
+    tech: ["React", "Redux", "CSS3", "LocalStorage"],
+    url: null,
+    status: "coming-soon",
+    iconName: "tasks",
+    statusColor: "#f59e0b",
+    statusText: "Coming Soon"
+  }
+];
+
+// Helper function to get icon by name
+const getIcon = (iconName) => {
+  switch(iconName) {
+    case 'chart': return <FaChartLine />;
+    case 'brain': return <FaBrain />;
+    case 'book': return <FaBook />;
+    case 'tasks': return <FaTasks />;
+    case 'plane': return <FaPlane />;
+    default: return <FaRocket />;
+  }
+};
 
 function LiveUrlPage() {
-  const [filter, setFilter] = useState('all'); // all, live, coming-soon
+  const { isAdmin, getAllLiveUrls, addLiveUrl, updateLiveUrl, deleteLiveUrl } = useAuth();
+  const [filter, setFilter] = useState('all');
+  const [liveUrls, setLiveUrls] = useState([]);
+  const [editingUrl, setEditingUrl] = useState(null);
+  const [showAddModal, setShowAddModal] = useState(false);
 
-  const projects = [
-    {
-      id: 1,
-      name: "Sales Dashboard",
-      description: "Interactive sales analytics dashboard with real-time metrics, predictive analytics, and data visualization.",
-      tech: ["React", "D3.js", "Chart.js", "Python", "FastAPI"],
-      liveUrl: "https://sales-dashboard-one-chi.vercel.app/",
-      status: "live",
-      icon: <FaChartLine />,
-      statusColor: "#10b981",
-      statusText: "Live Demo Available"
-    },
-    {
-      id: 2,
-      name: "Federated Medical Imaging",
-      description: "Privacy-preserving federated learning system for medical imaging with differential privacy.",
-      tech: ["Python", "PyTorch", "Flower", "Streamlit"],
-      liveUrl: null,
-      status: "coming-soon",
-      icon: <FaBrain />,
-      statusColor: "#f59e0b",
-      statusText: "Coming Soon"
-    },
-    {
-      id: 3,
-      name: "Library Management System",
-      description: "Comprehensive library management system with book borrowing and inventory tracking.",
-      tech: ["Java", "Spring Boot", "MySQL", "React"],
-      liveUrl: null,
-      status: "coming-soon",
-      icon: <FaBook />,
-      statusColor: "#f59e0b",
-      statusText: "Coming Soon"
-    },
-    {
-      id: 4,
-      name: "Planora",
-      description: "Smart project management and collaboration platform.",
-      tech: ["React", "Node.js", "MongoDB", "Express"],
-      liveUrl: null,
-      status: "coming-soon",
-      icon: <FaTasks />,
-      statusColor: "#f59e0b",
-      statusText: "Coming Soon"
-    },
-    {
-      id: 5,
-      name: "TravelEase",
-      description: "All-in-one travel planning platform for flights, hotels, and itineraries.",
-      tech: ["React", "Python", "Django", "PostgreSQL"],
-      liveUrl: null,
-      status: "coming-soon",
-      icon: <FaPlane />,
-      statusColor: "#f59e0b",
-      statusText: "Coming Soon"
-    },
-    {
-      id: 6,
-      name: "Travl",
-      description: "Social travel platform for sharing experiences and discovering hidden gems.",
-      tech: ["MERN Stack", "MongoDB", "Express", "React", "Node.js"],
-      liveUrl: null,
-      status: "coming-soon",
-      icon: <FaPlane />,
-      statusColor: "#f59e0b",
-      statusText: "Coming Soon"
-    },
-    {
-      id: 7,
-      name: "Todo App",
-      description: "Feature-rich todo application with task management and progress tracking.",
-      tech: ["React", "Redux", "CSS3", "LocalStorage"],
-      liveUrl: null,
-      status: "coming-soon",
-      icon: <FaTasks />,
-      statusColor: "#f59e0b",
-      statusText: "Coming Soon"
+  const loadUrls = () => {
+    const savedUrls = getAllLiveUrls();
+    if (savedUrls && savedUrls.length > 0) {
+      setLiveUrls(savedUrls);
+    } else {
+      localStorage.setItem('liveUrls', JSON.stringify(defaultLiveUrls));
+      setLiveUrls(defaultLiveUrls);
     }
-  ];
+  };
+
+  useEffect(() => {
+    loadUrls();
+  }, []);
 
   const filteredProjects = filter === 'all' 
-    ? projects 
+    ? liveUrls 
     : filter === 'live' 
-      ? projects.filter(p => p.status === 'live')
-      : projects.filter(p => p.status === 'coming-soon');
+      ? liveUrls.filter(p => p.status === 'live')
+      : liveUrls.filter(p => p.status === 'coming-soon');
 
-  const liveCount = projects.filter(p => p.status === 'live').length;
-  const comingSoonCount = projects.filter(p => p.status === 'coming-soon').length;
+  const liveCount = liveUrls.filter(p => p.status === 'live').length;
+  const comingSoonCount = liveUrls.filter(p => p.status === 'coming-soon').length;
+
+  const handleAddUrl = (newUrl) => {
+    if (addLiveUrl(newUrl)) {
+      loadUrls();
+      setShowAddModal(false);
+    }
+  };
+
+  const handleUpdateUrl = (updatedData) => {
+    if (updateLiveUrl(editingUrl.id, updatedData)) {
+      loadUrls();
+      setEditingUrl(null);
+    }
+  };
+
+  const handleDeleteUrl = (id) => {
+    if (window.confirm('Are you sure you want to delete this live URL?')) {
+      deleteLiveUrl(id);
+      loadUrls();
+    }
+  };
 
   const fadeInUp = {
     hidden: { opacity: 0, y: 30 },
@@ -118,30 +173,55 @@ function LiveUrlPage() {
     }}>
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
         
-        {/* Header Section */}
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={fadeInUp}
-          style={{ textAlign: 'center', marginBottom: '50px' }}
-        >
-          <motion.h1 
-            animate={{ scale: [1, 1.05, 1] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            style={{
-              fontSize: '3rem',
-              background: 'white',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              marginBottom: '15px'
-            }}
+        {/* Header Section with Admin Add Button */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px', flexWrap: 'wrap', gap: '15px' }}>
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={fadeInUp}
+            style={{ textAlign: 'left' }}
           >
-            🚀 Live URLs
-          </motion.h1>
-          <p style={{ fontSize: '1.2rem', color: 'rgba(255,255,255,0.95)', maxWidth: '700px', margin: '0 auto' }}>
-            Explore my deployed projects and see what's coming next!
-          </p>
-        </motion.div>
+            <motion.h1 
+              animate={{ scale: [1, 1.05, 1] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              style={{
+                fontSize: '3rem',
+                background: 'white',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                marginBottom: '15px'
+              }}
+            >
+              🚀 Live URLs
+            </motion.h1>
+            <p style={{ fontSize: '1.2rem', color: 'rgba(255,255,255,0.95)', maxWidth: '700px' }}>
+              Explore my deployed projects and see what's coming next!
+            </p>
+          </motion.div>
+          
+          {isAdmin() && (
+            <motion.button
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              onClick={() => setShowAddModal(true)}
+              style={{
+                padding: '12px 24px',
+                background: '#28a745',
+                color: 'white',
+                border: 'none',
+                borderRadius: '25px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                fontWeight: 'bold',
+                fontSize: '14px'
+              }}
+            >
+              <FaPlus /> Add Live URL
+            </motion.button>
+          )}
+        </div>
 
         {/* Stats Overview */}
         <motion.div
@@ -184,7 +264,7 @@ function LiveUrlPage() {
             textAlign: 'center',
             boxShadow: '0 5px 15px rgba(0,0,0,0.1)'
           }}>
-            <h3 style={{ fontSize: '2rem', color: '#667eea', margin: 0 }}>7</h3>
+            <h3 style={{ fontSize: '2rem', color: '#667eea', margin: 0 }}>{liveUrls.length}</h3>
             <p style={{ color: '#666' }}>Total Projects</p>
             <FaRocket style={{ color: '#667eea', fontSize: '1.2rem', marginTop: '5px' }} />
           </div>
@@ -281,8 +361,46 @@ function LiveUrlPage() {
                 color: 'white',
                 position: 'relative'
               }}>
-                <div style={{ fontSize: '2.5rem', marginBottom: '10px' }}>
-                  {project.icon}
+                <div style={{ fontSize: '2.5rem', marginBottom: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span>{getIcon(project.iconName)}</span>
+                  {isAdmin() && (
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                      <button 
+                        onClick={() => setEditingUrl(project)} 
+                        style={{ 
+                          background: 'rgba(255,255,255,0.2)', 
+                          border: 'none', 
+                          color: 'white', 
+                          padding: '8px 12px', 
+                          borderRadius: '8px', 
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '5px',
+                          fontSize: '12px'
+                        }}
+                      >
+                        <FaEdit /> Edit
+                      </button>
+                      <button 
+                        onClick={() => handleDeleteUrl(project.id)} 
+                        style={{ 
+                          background: 'rgba(255,255,255,0.2)', 
+                          border: 'none', 
+                          color: 'white', 
+                          padding: '8px 12px', 
+                          borderRadius: '8px', 
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '5px',
+                          fontSize: '12px'
+                        }}
+                      >
+                        <FaTrash /> Delete
+                      </button>
+                    </div>
+                  )}
                 </div>
                 <h2 style={{ margin: 0, fontSize: '1.5rem' }}>{project.name}</h2>
                 <div style={{
@@ -309,7 +427,7 @@ function LiveUrlPage() {
                 <div style={{ marginBottom: '20px' }}>
                   <h4 style={{ marginBottom: '10px', color: '#333' }}>🛠️ Tech Stack</h4>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                    {project.tech.map((tech, index) => (
+                    {project.tech && project.tech.map((tech, index) => (
                       <span key={index} style={{
                         background: '#f0f0f0',
                         color: '#667eea',
@@ -342,9 +460,9 @@ function LiveUrlPage() {
                     {project.status === 'live' ? 'Live Demo URL' : 'Status'}
                   </h4>
                   
-                  {project.status === 'live' ? (
+                  {project.status === 'live' && project.url ? (
                     <a
-                      href={project.liveUrl}
+                      href={project.url}
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{
@@ -354,7 +472,7 @@ function LiveUrlPage() {
                         fontWeight: '500'
                       }}
                     >
-                      {project.liveUrl}
+                      {project.url}
                     </a>
                   ) : (
                     <div>
@@ -369,11 +487,11 @@ function LiveUrlPage() {
                 </div>
 
                 {/* Action Buttons */}
-                {project.status === 'live' ? (
+                {project.status === 'live' && project.url ? (
                   <motion.a
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    href={project.liveUrl}
+                    href={project.url}
                     target="_blank"
                     rel="noopener noreferrer"
                     style={{
@@ -417,46 +535,48 @@ function LiveUrlPage() {
         </motion.div>
 
         {/* Featured Live Demo Banner for Sales Dashboard */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.5 }}
-          style={{
-            marginTop: '60px',
-            padding: '30px',
-            background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-            borderRadius: '20px',
-            textAlign: 'center',
-            boxShadow: '0 10px 30px rgba(0,0,0,0.2)'
-          }}
-        >
-          <h2 style={{ color: 'white', marginBottom: '15px' }}>🎯 Featured Live Demo</h2>
-          <p style={{ color: 'rgba(255,255,255,0.95)', marginBottom: '20px', fontSize: '1.1rem' }}>
-            Check out my Sales Dashboard - A comprehensive analytics platform with real-time metrics!
-          </p>
-          <motion.a
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            href="https://sales-dashboard-one-chi.vercel.app/"
-            target="_blank"
-            rel="noopener noreferrer"
+        {liveUrls.some(p => p.status === 'live') && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.5 }}
             style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '10px',
-              padding: '12px 35px',
-              background: 'white',
-              color: '#059669',
-              textDecoration: 'none',
-              borderRadius: '50px',
-              fontWeight: 'bold',
-              fontSize: '1.1rem'
+              marginTop: '60px',
+              padding: '30px',
+              background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+              borderRadius: '20px',
+              textAlign: 'center',
+              boxShadow: '0 10px 30px rgba(0,0,0,0.2)'
             }}
           >
-            <FaRocket /> Launch Sales Dashboard
-            <FaExternalLinkAlt />
-          </motion.a>
-        </motion.div>
+            <h2 style={{ color: 'white', marginBottom: '15px' }}>🎯 Featured Live Demo</h2>
+            <p style={{ color: 'rgba(255,255,255,0.95)', marginBottom: '20px', fontSize: '1.1rem' }}>
+              Check out my Sales Dashboard - A comprehensive analytics platform with real-time metrics!
+            </p>
+            <motion.a
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              href="https://sales-dashboard-one-chi.vercel.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '10px',
+                padding: '12px 35px',
+                background: 'white',
+                color: '#059669',
+                textDecoration: 'none',
+                borderRadius: '50px',
+                fontWeight: 'bold',
+                fontSize: '1.1rem'
+              }}
+            >
+              <FaRocket /> Launch Sales Dashboard
+              <FaExternalLinkAlt />
+            </motion.a>
+          </motion.div>
+        )}
 
         {/* Info Note */}
         <motion.div
@@ -478,6 +598,12 @@ function LiveUrlPage() {
           </p>
         </motion.div>
       </div>
+
+      {/* Add Live URL Modal */}
+      {showAddModal && <AddLiveUrlModal onClose={() => setShowAddModal(false)} onSave={handleAddUrl} />}
+      
+      {/* Edit Live URL Modal */}
+      {editingUrl && <EditLiveUrlModal liveUrl={editingUrl} onClose={() => setEditingUrl(null)} onSave={handleUpdateUrl} />}
     </div>
   );
 }

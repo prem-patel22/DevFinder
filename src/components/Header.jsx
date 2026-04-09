@@ -1,12 +1,17 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { FaGithub, FaBars, FaTimes, FaDownload, FaFilePdf, FaChevronDown } from 'react-icons/fa';
+import { FaGithub, FaBars, FaTimes, FaDownload, FaFilePdf, FaChevronDown, FaUser, FaUserShield, FaCrown } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
+import VisitorCounter from './VisitorCounter';
+import { useAuth } from '../context/AuthContext';
+import LoginModal from './LoginModal';
 
 function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
   const location = useLocation();
+  const { user, logout, isSuperAdmin, isAdmin } = useAuth();
 
   const navLinks = [
     { path: '/', name: 'Home' },
@@ -17,7 +22,6 @@ function Header() {
     { path: '/contact', name: 'Contact' }
   ];
 
-  // Download options
   const downloadOptions = [
     {
       name: 'Resume Only',
@@ -40,20 +44,43 @@ function Header() {
   ];
 
   const handleDownload = (filename, displayName) => {
-    // Create a temporary link element
     const link = document.createElement('a');
     link.href = `/${filename}`;
     link.download = filename;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    
-    // Close dropdown after download
     setIsDropdownOpen(false);
-    
-    // Optional: Track download analytics
-    console.log(`Downloading: ${displayName} (${filename})`);
   };
+
+  // Get role badge style and icon
+  const getRoleBadge = () => {
+    if (isSuperAdmin()) {
+      return {
+        icon: <FaCrown style={{ marginRight: '3px', fontSize: '10px' }} />,
+        text: 'Super Admin',
+        bgColor: '#8B5CF6',
+        textColor: 'white'
+      };
+    } else if (isAdmin()) {
+      return {
+        icon: <FaUserShield style={{ marginRight: '3px', fontSize: '10px' }} />,
+        text: 'Admin',
+        bgColor: '#f59e0b',
+        textColor: 'white'
+      };
+    } else if (user) {
+      return {
+        icon: <FaUser style={{ marginRight: '3px', fontSize: '10px' }} />,
+        text: 'User',
+        bgColor: '#10b981',
+        textColor: 'white'
+      };
+    }
+    return null;
+  };
+
+  const roleBadge = user ? getRoleBadge() : null;
 
   return (
     <motion.header
@@ -66,7 +93,6 @@ function Header() {
         position: 'sticky',
         top: 0,
         zIndex: 1000,
-        transition: 'background-color 0.3s ease'
       }}
     >
       <nav style={{
@@ -75,9 +101,10 @@ function Header() {
         alignItems: 'center',
         padding: '1rem 2rem',
         maxWidth: '1200px',
-        margin: '0 auto'
+        margin: '0 auto',
+        flexWrap: 'wrap',
+        gap: '10px'
       }}>
-        {/* Logo */}
         <Link to="/" style={{ textDecoration: 'none' }}>
           <motion.h1
             whileHover={{ scale: 1.05 }}
@@ -93,17 +120,13 @@ function Header() {
           </motion.h1>
         </Link>
 
-        {/* Desktop Navigation */}
         <div style={{
           display: 'flex',
-          gap: '20px',
-          alignItems: 'center'
+          gap: '15px',
+          alignItems: 'center',
+          flexWrap: 'wrap'
         }}>
-          {/* Navigation Links - Desktop */}
-          <div style={{ 
-            display: 'flex', 
-            gap: '20px'
-          }}>
+          <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
             {navLinks.map(link => (
               <Link
                 key={link.path}
@@ -112,7 +135,7 @@ function Header() {
                   textDecoration: 'none',
                   color: location.pathname === link.path ? '#667eea' : '#333',
                   fontWeight: location.pathname === link.path ? 'bold' : 'normal',
-                  transition: 'color 0.3s'
+                  fontSize: '14px'
                 }}
               >
                 {link.name}
@@ -120,7 +143,8 @@ function Header() {
             ))}
           </div>
 
-          {/* Download Dropdown Button */}
+          <VisitorCounter />
+
           <div style={{ position: 'relative' }}>
             <motion.button
               whileHover={{ scale: 1.05 }}
@@ -130,28 +154,25 @@ function Header() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
-                padding: '8px 16px',
+                padding: '6px 14px',
                 background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                 color: 'white',
                 border: 'none',
                 borderRadius: '25px',
                 fontWeight: 'bold',
-                fontSize: '14px',
+                fontSize: '12px',
                 cursor: 'pointer'
               }}
-              title="Download Documents"
             >
-              <FaDownload /> Downloads <FaChevronDown style={{ fontSize: '12px' }} />
+              <FaDownload /> Downloads <FaChevronDown style={{ fontSize: '10px' }} />
             </motion.button>
 
-            {/* Dropdown Menu */}
             <AnimatePresence>
               {isDropdownOpen && (
                 <motion.div
-                  initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                  transition={{ duration: 0.2 }}
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
                   style={{
                     position: 'absolute',
                     top: '100%',
@@ -165,21 +186,9 @@ function Header() {
                     zIndex: 1000
                   }}
                 >
-                  <div style={{
-                    padding: '12px',
-                    borderBottom: '1px solid #eee',
-                    background: '#f8f9fa'
-                  }}>
-                    <strong style={{ color: '#333' }}>Download Documents</strong>
-                    <p style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
-                      Choose what you'd like to download
-                    </p>
-                  </div>
-                  
                   {downloadOptions.map((option, index) => (
-                    <motion.button
+                    <button
                       key={index}
-                      whileHover={{ backgroundColor: '#f8f9fa' }}
                       onClick={() => handleDownload(option.filename, option.name)}
                       style={{
                         width: '100%',
@@ -190,66 +199,101 @@ function Header() {
                         border: 'none',
                         background: 'white',
                         cursor: 'pointer',
-                        textAlign: 'left',
                         borderBottom: index < downloadOptions.length - 1 ? '1px solid #eee' : 'none',
-                        transition: 'background 0.2s'
                       }}
                     >
-                      <div style={{
-                        background: '#667eea20',
-                        padding: '8px',
-                        borderRadius: '8px',
-                        color: '#667eea'
-                      }}>
+                      <div style={{ background: '#667eea20', padding: '8px', borderRadius: '8px', color: '#667eea' }}>
                         {option.icon}
                       </div>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ fontWeight: 'bold', color: '#333', fontSize: '14px' }}>
-                          {option.name}
-                        </div>
-                        <div style={{ fontSize: '12px', color: '#666' }}>
-                          {option.description}
-                        </div>
+                      <div style={{ textAlign: 'left' }}>
+                        <div style={{ fontWeight: 'bold', color: '#333', fontSize: '13px' }}>{option.name}</div>
+                        <div style={{ fontSize: '11px', color: '#666' }}>{option.description}</div>
                       </div>
-                      <FaDownload style={{ color: '#999', fontSize: '12px' }} />
-                    </motion.button>
+                    </button>
                   ))}
-                  
-                  <div style={{
-                    padding: '10px 16px',
-                    borderTop: '1px solid #eee',
-                    background: '#f8f9fa',
-                    fontSize: '11px',
-                    color: '#999',
-                    textAlign: 'center'
-                  }}>
-                    All documents are in PDF format
-                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
 
-          {/* BIGGER GITHUB ICON */}
+          {!user ? (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setShowLoginModal(true)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '8px 16px',
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '25px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: 'bold'
+              }}
+            >
+              <FaUser /> Login
+            </motion.button>
+          ) : (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ color: '#667eea', fontWeight: 'bold', fontSize: '14px' }}>
+                  👋 {user.name}
+                </span>
+                {roleBadge && (
+                  <span style={{
+                    background: roleBadge.bgColor,
+                    color: roleBadge.textColor,
+                    padding: '2px 8px',
+                    borderRadius: '12px',
+                    fontSize: '10px',
+                    fontWeight: 'bold',
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}>
+                    {roleBadge.icon} {roleBadge.text}
+                  </span>
+                )}
+              </div>
+              {isAdmin() && (
+                <Link to="/admin" style={{ color: '#667eea', textDecoration: 'none', fontSize: '14px', fontWeight: 'bold' }}>
+                  Dashboard
+                </Link>
+              )}
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={logout}
+                style={{
+                  padding: '5px 12px',
+                  background: '#dc3545',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '20px',
+                  cursor: 'pointer',
+                  fontSize: '12px',
+                  fontWeight: 'bold'
+                }}
+              >
+                Logout
+              </motion.button>
+            </div>
+          )}
+
           <motion.a
             href="https://github.com/prem-patel22"
             target="_blank"
             rel="noopener noreferrer"
             whileHover={{ scale: 1.2, rotate: 5 }}
             whileTap={{ scale: 0.9 }}
-            style={{
-              color: '#333',
-              fontSize: '2rem',
-              display: 'flex',
-              alignItems: 'center',
-              transition: 'all 0.3s ease'
-            }}
-            title="Visit my GitHub Profile"
+            style={{ color: '#333', fontSize: '2rem', display: 'flex', alignItems: 'center' }}
           >
             <FaGithub />
           </motion.a>
 
-          {/* Mobile Menu Button */}
           <motion.button
             whileTap={{ scale: 0.9 }}
             onClick={() => setIsOpen(!isOpen)}
@@ -268,7 +312,6 @@ function Header() {
         </div>
       </nav>
 
-      {/* Mobile Menu */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -286,86 +329,39 @@ function Header() {
             className="mobile-menu"
           >
             {navLinks.map(link => (
-              <Link
-                key={link.path}
-                to={link.path}
-                onClick={() => setIsOpen(false)}
-                style={{
-                  textDecoration: 'none',
-                  color: location.pathname === link.path ? '#667eea' : '#333',
-                  fontWeight: location.pathname === link.path ? 'bold' : 'normal',
-                  padding: '10px',
-                  transition: 'color 0.3s'
-                }}
-              >
+              <Link key={link.path} to={link.path} onClick={() => setIsOpen(false)} style={{ padding: '10px', textDecoration: 'none', color: location.pathname === link.path ? '#667eea' : '#333' }}>
                 {link.name}
               </Link>
             ))}
-            
-            {/* Mobile Download Options */}
-            <div style={{ borderTop: '1px solid #eee', paddingTop: '15px', marginTop: '5px' }}>
-              <div style={{ fontWeight: 'bold', marginBottom: '10px', color: '#333' }}>
-                <FaDownload style={{ marginRight: '8px' }} /> Downloads
+            <div style={{ padding: '10px 0' }}><VisitorCounter /></div>
+            {!user ? (
+              <button onClick={() => { setShowLoginModal(true); setIsOpen(false); }} style={{ padding: '10px', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
+                <FaUser /> Login
+              </button>
+            ) : (
+              <div style={{ padding: '10px', background: '#f8f9fa', borderRadius: '8px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                  <span style={{ fontWeight: 'bold' }}>👋 {user.name}</span>
+                  {roleBadge && (
+                    <span style={{ background: roleBadge.bgColor, color: roleBadge.textColor, padding: '2px 8px', borderRadius: '12px', fontSize: '10px' }}>
+                      {roleBadge.text}
+                    </span>
+                  )}
+                </div>
+                {isAdmin() && <Link to="/admin" style={{ display: 'block', marginBottom: '10px', color: '#667eea' }}>Dashboard</Link>}
+                <button onClick={logout} style={{ width: '100%', padding: '8px', background: '#dc3545', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>Logout</button>
               </div>
-              {downloadOptions.map((option, index) => (
-                <button
-                  key={index}
-                  onClick={() => {
-                    handleDownload(option.filename, option.name);
-                    setIsOpen(false);
-                  }}
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    background: '#f8f9fa',
-                    border: 'none',
-                    borderRadius: '8px',
-                    marginBottom: '8px',
-                    cursor: 'pointer',
-                    textAlign: 'left',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '10px'
-                  }}
-                >
-                  <FaFilePdf style={{ color: '#e74c3c' }} />
-                  <div>
-                    <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#333' }}>
-                      {option.name}
-                    </div>
-                    <div style={{ fontSize: '11px', color: '#666' }}>
-                      {option.description}
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Add responsive CSS */}
-      <style>
-        {`
-          @media (max-width: 968px) {
-            .mobile-menu-btn {
-              display: block !important;
-            }
-            .mobile-menu {
-              display: flex !important;
-            }
-          }
-          
-          @media (min-width: 969px) {
-            .mobile-menu-btn {
-              display: none !important;
-            }
-            .mobile-menu {
-              display: none !important;
-            }
-          }
-        `}
-      </style>
+      <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
+
+      <style>{`
+        @media (max-width: 968px) { .mobile-menu-btn { display: block !important; } .mobile-menu { display: flex !important; } }
+        @media (min-width: 969px) { .mobile-menu-btn { display: none !important; } .mobile-menu { display: none !important; } }
+      `}</style>
     </motion.header>
   );
 }

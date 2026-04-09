@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaGithub, FaExternalLinkAlt, FaSearch, FaFilter, FaBrain, FaBook, FaPlane, FaTasks, FaChartLine } from 'react-icons/fa';
+import { FaGithub, FaExternalLinkAlt, FaSearch, FaFilter, FaBrain, FaBook, FaPlane, FaTasks, FaChartLine, FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
+import { useAuth } from '../context/AuthContext';
+import { EditProjectModal } from '../components/EditModals';
 
-// Your actual GitHub projects
-const allProjects = [
+// Default projects (fallback if no projects in localStorage)
+const defaultProjects = [
   {
     id: 1,
     title: "Federated Medical Imaging",
@@ -13,7 +15,7 @@ const allProjects = [
     liveLink: null,
     category: "AI/ML",
     featured: true,
-    icon: <FaBrain />,
+    iconName: "brain",
     stats: {
       accuracy: "87.3%",
       hospitals: 3,
@@ -29,7 +31,7 @@ const allProjects = [
     liveLink: null,
     category: "Web App",
     featured: true,
-    icon: <FaBook />,
+    iconName: "book",
     stats: {
       books: "10,000+",
       users: "500+",
@@ -45,7 +47,7 @@ const allProjects = [
     liveLink: null,
     category: "Web App",
     featured: true,
-    icon: <FaTasks />,
+    iconName: "tasks",
     stats: {
       tasks: "1,000+",
       teams: "50+",
@@ -61,7 +63,7 @@ const allProjects = [
     liveLink: null,
     category: "Travel",
     featured: false,
-    icon: <FaPlane />,
+    iconName: "plane",
     stats: {
       destinations: "500+",
       bookings: "2,000+",
@@ -77,7 +79,7 @@ const allProjects = [
     liveLink: null,
     category: "Travel",
     featured: false,
-    icon: <FaPlane />,
+    iconName: "plane",
     stats: {
       posts: "3,000+",
       photos: "10,000+",
@@ -93,7 +95,7 @@ const allProjects = [
     liveLink: null,
     category: "Productivity",
     featured: false,
-    icon: <FaTasks />,
+    iconName: "tasks",
     stats: {
       features: "15+",
       downloads: "1,000+",
@@ -109,7 +111,7 @@ const allProjects = [
     liveLink: null,
     category: "Analytics",
     featured: true,
-    icon: <FaChartLine />,
+    iconName: "chart",
     stats: {
       metrics: "20+",
       reports: "50+",
@@ -118,20 +120,87 @@ const allProjects = [
   }
 ];
 
+// Helper function to get icon by name
+const getIcon = (iconName) => {
+  switch(iconName) {
+    case 'brain': return <FaBrain />;
+    case 'book': return <FaBook />;
+    case 'tasks': return <FaTasks />;
+    case 'plane': return <FaPlane />;
+    case 'chart': return <FaChartLine />;
+    default: return <FaGithub />;
+  }
+};
+
 function ProjectsPage() {
+  const { isAdmin, getAllProjects, addProject, updateProject, deleteProject } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
-  const [showStats, setShowStats] = useState(false);
+  const [projects, setProjects] = useState([]);
+  const [editingProject, setEditingProject] = useState(null);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newProject, setNewProject] = useState({ 
+    title: '', 
+    description: '', 
+    tech: '', 
+    githubLink: '', 
+    category: 'Web App',
+    featured: false,
+    iconName: 'github'
+  });
+
+  const loadProjects = () => {
+    const savedProjects = getAllProjects();
+    if (savedProjects && savedProjects.length > 0) {
+      setProjects(savedProjects);
+    } else {
+      localStorage.setItem('adminProjects', JSON.stringify(defaultProjects));
+      setProjects(defaultProjects);
+    }
+  };
+
+  useEffect(() => {
+    loadProjects();
+  }, []);
 
   const categories = ['All', 'AI/ML', 'Web App', 'Travel', 'Productivity', 'Analytics'];
 
-  const filteredProjects = allProjects.filter(project => {
-    const matchesSearch = project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          project.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          project.tech.some(tech => tech.toLowerCase().includes(searchTerm.toLowerCase()));
+  const filteredProjects = projects.filter(project => {
+    const matchesSearch = searchTerm === '' || 
+      project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      project.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (project.tech && project.tech.some(tech => tech.toLowerCase().includes(searchTerm.toLowerCase())));
     const matchesCategory = selectedCategory === 'All' || project.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
+
+  const handleAddProject = () => {
+    const projectToAdd = {
+      ...newProject,
+      tech: newProject.tech.split(',').map(t => t.trim()),
+      id: Date.now(),
+      createdAt: new Date().toISOString()
+    };
+    if (addProject(projectToAdd)) {
+      loadProjects();
+      setShowAddModal(false);
+      setNewProject({ title: '', description: '', tech: '', githubLink: '', category: 'Web App', featured: false, iconName: 'github' });
+    }
+  };
+
+  const handleUpdateProject = (updatedData) => {
+    if (updateProject(editingProject.id, updatedData)) {
+      loadProjects();
+      setEditingProject(null);
+    }
+  };
+
+  const handleDeleteProject = (id) => {
+    if (window.confirm('Are you sure you want to delete this project?')) {
+      deleteProject(id);
+      loadProjects();
+    }
+  };
 
   const fadeInUp = {
     hidden: { opacity: 0, y: 30 },
@@ -147,30 +216,54 @@ function ProjectsPage() {
       <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
         
         {/* Header Section */}
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={fadeInUp}
-          style={{ textAlign: 'center', marginBottom: '50px' }}
-        >
-          <motion.h1 
-            animate={{ scale: [1, 1.05, 1] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            style={{
-              fontSize: '3rem',
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              marginBottom: '15px'
-            }}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px', flexWrap: 'wrap', gap: '15px' }}>
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={fadeInUp}
           >
-            My GitHub Projects
-          </motion.h1>
-          <p style={{ fontSize: '1.2rem', color: '#666', maxWidth: '700px', margin: '0 auto' }}>
-            🚀 7 innovative projects showcasing my expertise in full-stack development, 
-            AI/ML, and modern web technologies
-          </p>
-        </motion.div>
+            <motion.h1 
+              animate={{ scale: [1, 1.05, 1] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              style={{
+                fontSize: '3rem',
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                marginBottom: '15px'
+              }}
+            >
+              My GitHub Projects
+            </motion.h1>
+            <p style={{ fontSize: '1.2rem', color: '#666', maxWidth: '700px' }}>
+              🚀 {projects.length} innovative projects showcasing my expertise in full-stack development, 
+              AI/ML, and modern web technologies
+            </p>
+          </motion.div>
+          
+          {isAdmin() && (
+            <motion.button
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              onClick={() => setShowAddModal(true)}
+              style={{
+                padding: '12px 24px',
+                background: '#28a745',
+                color: 'white',
+                border: 'none',
+                borderRadius: '25px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                fontWeight: 'bold',
+                fontSize: '14px'
+              }}
+            >
+              <FaPlus /> Add New Project
+            </motion.button>
+          )}
+        </div>
 
         {/* Stats Overview */}
         <motion.div
@@ -191,7 +284,7 @@ function ProjectsPage() {
             textAlign: 'center',
             boxShadow: '0 5px 15px rgba(0,0,0,0.1)'
           }}>
-            <h3 style={{ fontSize: '2rem', color: '#667eea' }}>7</h3>
+            <h3 style={{ fontSize: '2rem', color: '#667eea' }}>{projects.length}</h3>
             <p style={{ color: '#666' }}>Total Projects</p>
           </div>
           <div style={{
@@ -233,7 +326,6 @@ function ProjectsPage() {
             boxShadow: '0 5px 15px rgba(0,0,0,0.1)'
           }}
         >
-          {/* Search Box */}
           <div style={{
             display: 'flex',
             alignItems: 'center',
@@ -257,8 +349,6 @@ function ProjectsPage() {
               }}
             />
           </div>
-
-          {/* Category Filter */}
           <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
             <FaFilter style={{ color: '#667eea', alignSelf: 'center' }} />
             {categories.map(category => (
@@ -271,8 +361,7 @@ function ProjectsPage() {
                   color: selectedCategory === category ? 'white' : '#666',
                   border: 'none',
                   borderRadius: '20px',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s'
+                  cursor: 'pointer'
                 }}
               >
                 {category}
@@ -282,166 +371,90 @@ function ProjectsPage() {
         </motion.div>
 
         {/* Projects Grid */}
-        <AnimatePresence>
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={{
-              hidden: { opacity: 0 },
-              visible: {
-                opacity: 1,
-                transition: { staggerChildren: 0.1 }
-              }
-            }}
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))',
-              gap: '30px'
-            }}
-          >
-            {filteredProjects.map((project) => (
-              <motion.div
-                key={project.id}
-                variants={fadeInUp}
-                whileHover={{ y: -10, transition: { duration: 0.3 } }}
-                layout
-                style={{
-                  background: 'white',
-                  borderRadius: '20px',
-                  overflow: 'hidden',
-                  boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
-                  transition: 'all 0.3s ease'
-                }}
-              >
-                {/* Project Header with Gradient */}
-                <div style={{
-                  background: `linear-gradient(135deg, #667eea 0%, #764ba2 100%)`,
-                  padding: '25px',
-                  color: 'white',
-                  position: 'relative'
-                }}>
-                  <div style={{ fontSize: '2.5rem', marginBottom: '10px' }}>
-                    {project.icon}
-                  </div>
-                  <h2 style={{ margin: 0, fontSize: '1.5rem' }}>{project.title}</h2>
-                  {project.featured && (
-                    <span style={{
-                      position: 'absolute',
-                      top: '20px',
-                      right: '20px',
-                      background: 'rgba(255,255,255,0.3)',
-                      padding: '5px 10px',
-                      borderRadius: '20px',
-                      fontSize: '12px'
-                    }}>
-                      ⭐ Featured
-                    </span>
-                  )}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))', gap: '25px' }}>
+          {filteredProjects.map(project => (
+            <motion.div 
+              key={project.id} 
+              whileHover={{ y: -5 }} 
+              style={{ 
+                background: 'white', 
+                borderRadius: '20px', 
+                overflow: 'hidden', 
+                boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+                transition: 'all 0.3s ease'
+              }}
+            >
+              <div style={{
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                padding: '25px',
+                color: 'white',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+              }}>
+                <div style={{ fontSize: '2.5rem' }}>
+                  {getIcon(project.iconName)}
                 </div>
-
-                {/* Project Body */}
-                <div style={{ padding: '25px' }}>
-                  <p style={{ color: '#666', lineHeight: '1.6', marginBottom: '20px' }}>
-                    {project.description}
-                  </p>
-
-                  {/* Tech Stack */}
-                  <div style={{ marginBottom: '20px' }}>
-                    <h4 style={{ marginBottom: '10px', color: '#333' }}>🛠️ Tech Stack</h4>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                      {project.tech.map((tech, index) => (
-                        <span key={index} style={{
-                          background: '#f0f0f0',
-                          color: '#667eea',
-                          padding: '5px 12px',
-                          borderRadius: '20px',
-                          fontSize: '12px',
-                          fontWeight: '500'
-                        }}>
-                          {tech}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Stats Section */}
-                  {project.stats && (
-                    <div style={{ 
-                      marginBottom: '20px',
-                      background: '#f8f9fa',
-                      padding: '15px',
-                      borderRadius: '10px'
-                    }}>
-                      <h4 style={{ marginBottom: '10px', color: '#333' }}>📊 Key Metrics</h4>
-                      <div style={{ display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap', gap: '10px' }}>
-                        {Object.entries(project.stats).map(([key, value]) => (
-                          <div key={key} style={{ textAlign: 'center' }}>
-                            <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#667eea' }}>
-                              {value}
-                            </div>
-                            <div style={{ fontSize: '12px', color: '#666' }}>
-                              {key.charAt(0).toUpperCase() + key.slice(1)}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Action Buttons */}
-                  <div style={{ display: 'flex', gap: '15px', marginTop: '20px' }}>
-                    <motion.a
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      href={project.githubLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{
-                        flex: 1,
+                {isAdmin() && (
+                  <div style={{ display: 'flex', gap: '10px' }}>
+                    <button 
+                      onClick={() => setEditingProject(project)} 
+                      style={{ 
+                        background: 'rgba(255,255,255,0.2)', 
+                        border: 'none', 
+                        color: 'white', 
+                        padding: '8px 12px', 
+                        borderRadius: '8px', 
+                        cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '8px',
-                        padding: '12px',
-                        background: '#333',
-                        color: 'white',
-                        textDecoration: 'none',
-                        borderRadius: '10px',
-                        fontWeight: 'bold'
+                        gap: '5px',
+                        fontSize: '12px'
                       }}
                     >
-                      <FaGithub /> View Code
-                    </motion.a>
-                    {project.liveLink && (
-                      <motion.a
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        href={project.liveLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{
-                          flex: 1,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          gap: '8px',
-                          padding: '12px',
-                          background: '#667eea',
-                          color: 'white',
-                          textDecoration: 'none',
-                          borderRadius: '10px',
-                          fontWeight: 'bold'
-                        }}
-                      >
-                        <FaExternalLinkAlt /> Live Demo
-                      </motion.a>
-                    )}
+                      <FaEdit /> Edit
+                    </button>
+                    <button 
+                      onClick={() => handleDeleteProject(project.id)} 
+                      style={{ 
+                        background: 'rgba(255,255,255,0.2)', 
+                        border: 'none', 
+                        color: 'white', 
+                        padding: '8px 12px', 
+                        borderRadius: '8px', 
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '5px',
+                        fontSize: '12px'
+                      }}
+                    >
+                      <FaTrash /> Delete
+                    </button>
                   </div>
+                )}
+              </div>
+              <div style={{ padding: '25px' }}>
+                <h3 style={{ marginBottom: '10px' }}>{project.title}</h3>
+                <p style={{ color: '#666', lineHeight: '1.6', marginBottom: '20px' }}>
+                  {project.description}
+                </p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '20px' }}>
+                  {project.tech && project.tech.map((t, i) => (
+                    <span key={i} style={{ background: '#f0f0f0', color: '#667eea', padding: '5px 12px', borderRadius: '20px', fontSize: '12px' }}>
+                      {t}
+                    </span>
+                  ))}
                 </div>
-              </motion.div>
-            ))}
-          </motion.div>
-        </AnimatePresence>
+                <div style={{ display: 'flex', gap: '15px' }}>
+                  <a href={project.githubLink} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#333', textDecoration: 'none' }}>
+                    <FaGithub /> GitHub
+                  </a>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
 
         {/* Empty State */}
         {filteredProjects.length === 0 && (
@@ -499,6 +512,90 @@ function ProjectsPage() {
           </a>
         </motion.div>
       </div>
+
+      {/* Add Project Modal */}
+      {showAddModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.7)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 2000
+        }} onClick={() => setShowAddModal(false)}>
+          <div style={{
+            background: 'white',
+            padding: '30px',
+            borderRadius: '20px',
+            width: '90%',
+            maxWidth: '500px'
+          }} onClick={(e) => e.stopPropagation()}>
+            <h2 style={{ marginBottom: '20px' }}>Add New Project</h2>
+            <input
+              type="text"
+              placeholder="Project Title"
+              value={newProject.title}
+              onChange={(e) => setNewProject({ ...newProject, title: e.target.value })}
+              style={{ width: '100%', padding: '12px', marginBottom: '15px', border: '1px solid #ddd', borderRadius: '8px' }}
+              required
+            />
+            <textarea
+              placeholder="Description"
+              value={newProject.description}
+              onChange={(e) => setNewProject({ ...newProject, description: e.target.value })}
+              style={{ width: '100%', padding: '12px', marginBottom: '15px', border: '1px solid #ddd', borderRadius: '8px', minHeight: '80px' }}
+              required
+            />
+            <input
+              type="text"
+              placeholder="Tech Stack (comma separated)"
+              value={newProject.tech}
+              onChange={(e) => setNewProject({ ...newProject, tech: e.target.value })}
+              style={{ width: '100%', padding: '12px', marginBottom: '15px', border: '1px solid #ddd', borderRadius: '8px' }}
+              required
+            />
+            <input
+              type="url"
+              placeholder="GitHub Link"
+              value={newProject.githubLink}
+              onChange={(e) => setNewProject({ ...newProject, githubLink: e.target.value })}
+              style={{ width: '100%', padding: '12px', marginBottom: '15px', border: '1px solid #ddd', borderRadius: '8px' }}
+            />
+            <select
+              value={newProject.category}
+              onChange={(e) => setNewProject({ ...newProject, category: e.target.value })}
+              style={{ width: '100%', padding: '12px', marginBottom: '20px', border: '1px solid #ddd', borderRadius: '8px' }}
+            >
+              <option value="AI/ML">AI/ML</option>
+              <option value="Web App">Web App</option>
+              <option value="Travel">Travel</option>
+              <option value="Productivity">Productivity</option>
+              <option value="Analytics">Analytics</option>
+            </select>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button onClick={handleAddProject} style={{ padding: '12px 20px', background: '#28a745', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', flex: 1, fontWeight: 'bold' }}>
+                Add Project
+              </button>
+              <button onClick={() => setShowAddModal(false)} style={{ padding: '12px 20px', background: '#dc3545', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', flex: 1, fontWeight: 'bold' }}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Project Modal */}
+      {editingProject && (
+        <EditProjectModal 
+          project={editingProject} 
+          onClose={() => setEditingProject(null)} 
+          onSave={handleUpdateProject} 
+        />
+      )}
     </div>
   );
 }

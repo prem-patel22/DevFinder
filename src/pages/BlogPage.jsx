@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { FaSearch, FaCalendar, FaUser, FaBookOpen, FaArrowRight, FaTimes, FaTag } from 'react-icons/fa';
+import { FaSearch, FaCalendar, FaUser, FaBookOpen, FaArrowRight, FaTimes, FaTag, FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
+import { useAuth } from '../context/AuthContext';
+import { EditBlogModal } from '../components/EditModals';
 
-// Sample blog posts - MAKE SURE THIS ARRAY IS HERE
-const blogPosts = [
+// Default blog posts (fallback if no data in localStorage)
+const defaultBlogPosts = [
   {
     id: 1,
     title: "Getting Started with React Hooks",
@@ -131,42 +133,72 @@ Closures are powerful - master them to write better JavaScript!
 ];
 
 function BlogPage() {
+  const { isAdmin, getAllBlogPosts, addBlogPost, updateBlogPost, deleteBlogPost } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedPost, setSelectedPost] = useState(null);
-  
+  const [blogPosts, setBlogPosts] = useState([]);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newPost, setNewPost] = useState({ title: '', excerpt: '', content: '', category: '', tags: '' });
+  const [editingPost, setEditingPost] = useState(null);
+
+  const loadPosts = () => {
+    // Try to get posts from localStorage first, otherwise use default
+    const savedPosts = getAllBlogPosts();
+    if (savedPosts && savedPosts.length > 0) {
+      setBlogPosts(savedPosts);
+    } else {
+      // Initialize localStorage with default posts if empty
+      localStorage.setItem('adminBlogs', JSON.stringify(defaultBlogPosts));
+      setBlogPosts(defaultBlogPosts);
+    }
+  };
+
+  useEffect(() => {
+    loadPosts();
+  }, []);
+
   const categories = ['All', 'React Tips', 'ML Learning', 'Spring Boot Guides', 'JavaScript'];
 
-  // Filter posts based on search and category
   const filteredPosts = blogPosts.filter(post => {
     const matchesSearch = searchTerm === '' || 
       post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       post.excerpt.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      post.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+      (post.tags && post.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase())));
     
     const matchesCategory = selectedCategory === 'All' || post.category === selectedCategory;
     
     return matchesSearch && matchesCategory;
   });
 
-  // If no posts, show message
-  if (blogPosts.length === 0) {
-    return (
-      <div style={{ 
-        minHeight: '100vh', 
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        padding: '60px 20px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-      }}>
-        <div style={{ background: 'white', padding: '40px', borderRadius: '20px', textAlign: 'center' }}>
-          <h2>No blog posts found</h2>
-          <p>Please check the blogPosts array in BlogPage.jsx</p>
-        </div>
-      </div>
-    );
-  }
+  const handleAddPost = () => {
+    const post = {
+      ...newPost,
+      tags: newPost.tags.split(',').map(t => t.trim()),
+      author: 'Super Admin',
+      readTime: '5 min read',
+      date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+    };
+    if (addBlogPost(post)) {
+      loadPosts();
+      setShowAddModal(false);
+      setNewPost({ title: '', excerpt: '', content: '', category: '', tags: '' });
+    }
+  };
+
+  const handleUpdatePost = (updatedData) => {
+    if (updateBlogPost(editingPost.id, updatedData)) {
+      loadPosts();
+      setEditingPost(null);
+    }
+  };
+
+  const handleDeletePost = (id) => {
+    if (window.confirm('Are you sure you want to delete this blog post?')) {
+      deleteBlogPost(id);
+      loadPosts();
+    }
+  };
 
   return (
     <div style={{ 
@@ -178,14 +210,36 @@ function BlogPage() {
         
         {!selectedPost ? (
           <>
-            {/* Header */}
-            <div style={{ textAlign: 'center', marginBottom: '50px' }}>
-              <h1 style={{ fontSize: '3rem', color: 'white', marginBottom: '15px' }}>
-                📝 Tech Blog
-              </h1>
-              <p style={{ fontSize: '1.2rem', color: 'rgba(255,255,255,0.95)' }}>
-                Sharing my learning journey in development and AI/ML
-              </p>
+            {/* Header with Admin Add Button */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px', flexWrap: 'wrap', gap: '15px' }}>
+              <div>
+                <h1 style={{ fontSize: '3rem', color: 'white', marginBottom: '15px' }}>
+                  📝 Tech Blog
+                </h1>
+                <p style={{ fontSize: '1.2rem', color: 'rgba(255,255,255,0.95)' }}>
+                  Sharing my learning journey in development and AI/ML
+                </p>
+              </div>
+              {isAdmin() && (
+                <button 
+                  onClick={() => setShowAddModal(true)} 
+                  style={{
+                    padding: '12px 24px',
+                    background: '#28a745',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '25px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    fontWeight: 'bold',
+                    fontSize: '14px'
+                  }}
+                >
+                  <FaPlus /> Add Blog Post
+                </button>
+              )}
             </div>
 
             {/* Search Bar */}
@@ -259,13 +313,13 @@ function BlogPage() {
             {/* Blog Posts Grid */}
             <div style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))',
               gap: '30px'
             }}>
               {filteredPosts.map((post) => (
-                <div
+                <motion.div
                   key={post.id}
-                  onClick={() => setSelectedPost(post)}
+                  whileHover={{ y: -5 }}
                   style={{
                     background: 'white',
                     borderRadius: '20px',
@@ -274,15 +328,59 @@ function BlogPage() {
                     boxShadow: '0 10px 30px rgba(0,0,0,0.15)',
                     transition: 'transform 0.3s ease'
                   }}
-                  onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-10px)'}
-                  onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                  onClick={() => setSelectedPost(post)}
                 >
                   <div style={{
                     background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                    padding: '30px',
-                    color: 'white'
+                    padding: '25px',
+                    color: 'white',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
                   }}>
-                    <FaBookOpen size={40} />
+                    <FaBookOpen size={35} />
+                    {isAdmin() && (
+                      <div style={{ display: 'flex', gap: '10px' }}>
+                        <button 
+                          onClick={(e) => { 
+                            e.stopPropagation(); 
+                            setEditingPost(post); 
+                          }} 
+                          style={{ 
+                            background: 'rgba(255,255,255,0.2)', 
+                            border: 'none', 
+                            color: 'white', 
+                            padding: '8px', 
+                            borderRadius: '8px', 
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '5px'
+                          }}
+                        >
+                          <FaEdit /> Edit
+                        </button>
+                        <button 
+                          onClick={(e) => { 
+                            e.stopPropagation(); 
+                            handleDeletePost(post.id); 
+                          }} 
+                          style={{ 
+                            background: 'rgba(255,255,255,0.2)', 
+                            border: 'none', 
+                            color: 'white', 
+                            padding: '8px', 
+                            borderRadius: '8px', 
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '5px'
+                          }}
+                        >
+                          <FaTrash /> Delete
+                        </button>
+                      </div>
+                    )}
                   </div>
                   <div style={{ padding: '25px' }}>
                     <h3 style={{ 
@@ -311,7 +409,7 @@ function BlogPage() {
                       <span>{post.readTime}</span>
                     </div>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                      {post.tags.map(tag => (
+                      {post.tags && post.tags.map(tag => (
                         <span key={tag} style={{
                           background: '#f0f0f0',
                           color: '#667eea',
@@ -344,7 +442,7 @@ function BlogPage() {
                       Read Article <FaArrowRight style={{ marginLeft: '8px' }} />
                     </button>
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
 
@@ -407,6 +505,83 @@ function BlogPage() {
           </div>
         )}
       </div>
+
+      {/* Add Blog Modal */}
+      {showAddModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.7)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 2000
+        }} onClick={() => setShowAddModal(false)}>
+          <div style={{
+            background: 'white',
+            padding: '30px',
+            borderRadius: '20px',
+            width: '90%',
+            maxWidth: '600px',
+            maxHeight: '80vh',
+            overflowY: 'auto'
+          }} onClick={(e) => e.stopPropagation()}>
+            <h2 style={{ marginBottom: '20px' }}>Add New Blog Post</h2>
+            <input
+              type="text"
+              placeholder="Title"
+              value={newPost.title}
+              onChange={(e) => setNewPost({ ...newPost, title: e.target.value })}
+              style={{ width: '100%', padding: '12px', marginBottom: '15px', border: '1px solid #ddd', borderRadius: '8px' }}
+              required
+            />
+            <input
+              type="text"
+              placeholder="Excerpt (short summary)"
+              value={newPost.excerpt}
+              onChange={(e) => setNewPost({ ...newPost, excerpt: e.target.value })}
+              style={{ width: '100%', padding: '12px', marginBottom: '15px', border: '1px solid #ddd', borderRadius: '8px' }}
+              required
+            />
+            <textarea
+              placeholder="Content (Markdown supported)"
+              value={newPost.content}
+              onChange={(e) => setNewPost({ ...newPost, content: e.target.value })}
+              style={{ width: '100%', padding: '12px', marginBottom: '15px', border: '1px solid #ddd', borderRadius: '8px', minHeight: '150px' }}
+              required
+            />
+            <input
+              type="text"
+              placeholder="Category (e.g., React Tips, ML Learning)"
+              value={newPost.category}
+              onChange={(e) => setNewPost({ ...newPost, category: e.target.value })}
+              style={{ width: '100%', padding: '12px', marginBottom: '15px', border: '1px solid #ddd', borderRadius: '8px' }}
+              required
+            />
+            <input
+              type="text"
+              placeholder="Tags (comma separated, e.g., React, JavaScript, Hooks)"
+              value={newPost.tags}
+              onChange={(e) => setNewPost({ ...newPost, tags: e.target.value })}
+              style={{ width: '100%', padding: '12px', marginBottom: '20px', border: '1px solid #ddd', borderRadius: '8px' }}
+            />
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button onClick={handleAddPost} style={{ padding: '12px 20px', background: '#28a745', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', flex: 1, fontWeight: 'bold' }}>
+                Publish Post
+              </button>
+              <button onClick={() => setShowAddModal(false)} style={{ padding: '12px 20px', background: '#dc3545', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', flex: 1, fontWeight: 'bold' }}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Blog Modal */}
+      {editingPost && <EditBlogModal post={editingPost} onClose={() => setEditingPost(null)} onSave={handleUpdatePost} />}
     </div>
   );
 }
