@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "DevFinder",
+  "name": "DevFinder - Developer Portfolio Platform",
   "icons": [
     {
       "src": "favicon.ico",
@@ -10,16 +10,32 @@
     {
       "src": "logo192.png",
       "type": "image/png",
-      "sizes": "192x192"
+      "sizes": "192x192",
+      "purpose": "any maskable"
     },
     {
       "src": "logo512.png",
       "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "512x512",
+      "purpose": "any maskable"
     }
   ],
-  "start_url": ".",
+  "start_url": "/DevFinder/",
+  "scope": "/DevFinder/",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#667eea",
+  "background_color": "#ffffff",
+  "orientation": "portrait",
+  "categories": ["portfolio", "developer", "productivity"],
+  "description": "A modern developer portfolio platform to showcase projects, blog posts, and connect with recruiters.",
+  "screenshots": [
+    {
+      "src": "screenshot1.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "platform": "narrow"
+    }
+  ],
+  "prefer_related_applications": false,
+  "related_applications": []
 }
