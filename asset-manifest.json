@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/DevFinder/static/css/main.bfdc40fa.css",
-    "main.js": "/DevFinder/static/js/main.c1d3d87e.js",
+    "main.js": "/DevFinder/static/js/main.932259c6.js",
     "index.html": "/DevFinder/index.html",
     "main.bfdc40fa.css.map": "/DevFinder/static/css/main.bfdc40fa.css.map",
-    "main.c1d3d87e.js.map": "/DevFinder/static/js/main.c1d3d87e.js.map"
+    "main.932259c6.js.map": "/DevFinder/static/js/main.932259c6.js.map"
   },
   "entrypoints": [
     "static/css/main.bfdc40fa.css",
-    "static/js/main.c1d3d87e.js"
+    "static/js/main.932259c6.js"
   ]
 }
