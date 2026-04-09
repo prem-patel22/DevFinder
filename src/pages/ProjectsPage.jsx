@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { FaGithub, FaExternalLinkAlt, FaSearch, FaFilter, FaBrain, FaBook, FaPlane, FaTasks, FaChartLine, FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import { EditProjectModal } from '../components/EditModals';
+import ThreeDCard from '../components/ThreeDCard';
 
 // Default projects (fallback if no projects in localStorage)
 const defaultProjects = [
@@ -308,6 +309,32 @@ function ProjectsPage() {
             <p style={{ color: '#666' }}>Open Source</p>
           </div>
         </motion.div>
+
+        {/* Featured 3D Projects Section */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          style={{ marginBottom: '60px' }}
+        >
+          <h2 style={{ textAlign: 'center', marginBottom: '30px', color: '#333' }}>
+            🌟 Featured 3D Projects
+          </h2>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+            gap: '30px'
+          }}>
+            {projects.filter(p => p.featured).slice(0, 3).map(project => (
+              <ThreeDCard
+                key={project.id}
+                title={project.title}
+                tech={project.tech?.slice(0, 3).join(', ')}
+                color="#667eea"
+              />
+            ))}
+          </div>
+        </motion.section>
 
         {/* Search and Filter Bar */}
         <motion.div

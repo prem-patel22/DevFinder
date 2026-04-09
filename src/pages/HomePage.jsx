@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FaCode, FaUsers, FaRocket, FaArrowRight } from 'react-icons/fa';
+import ThreeDGlobe from '../components/ThreeDGlobe';
 
-// Typing animation component
+// Enhanced Typing animation component
 function TypingAnimation() {
   const [text, setText] = useState('');
   const [index, setIndex] = useState(0);
   const [wordIndex, setWordIndex] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
   
   const words = [
     "Full Stack Developer 💻",
@@ -19,28 +21,33 @@ function TypingAnimation() {
   useEffect(() => {
     const currentWord = words[wordIndex];
     
-    if (index < currentWord.length) {
+    if (!isDeleting && index < currentWord.length) {
       const timeout = setTimeout(() => {
         setText(prev => prev + currentWord[index]);
         setIndex(prev => prev + 1);
       }, 100);
       return () => clearTimeout(timeout);
-    } else {
+    } else if (!isDeleting && index === currentWord.length) {
+      setTimeout(() => setIsDeleting(true), 2000);
+    } else if (isDeleting && index > 0) {
       const timeout = setTimeout(() => {
-        setIndex(0);
-        setText('');
-        setWordIndex(prev => (prev + 1) % words.length);
-      }, 2000);
+        setText(prev => prev.slice(0, -1));
+        setIndex(prev => prev - 1);
+      }, 50);
       return () => clearTimeout(timeout);
+    } else if (isDeleting && index === 0) {
+      setIsDeleting(false);
+      setWordIndex(prev => (prev + 1) % words.length);
     }
-  }, [index, wordIndex]);
+  }, [index, wordIndex, isDeleting]);
   
   return (
     <h2 style={{
       fontSize: '1.8rem',
       color: '#f0f0f0',
       marginBottom: '20px',
-      minHeight: '70px'
+      minHeight: '70px',
+      fontFamily: 'monospace'
     }}>
       {text}
       <span style={{
@@ -56,7 +63,6 @@ function TypingAnimation() {
 }
 
 function HomePage() {
-  // Animation variants
   const fadeInUp = {
     hidden: { opacity: 0, y: 60 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
@@ -151,7 +157,7 @@ function HomePage() {
             Find Your Perfect Dev Match
           </motion.h1>
           
-          {/* Typing Animation Component */}
+          {/* Enhanced Typing Animation Component */}
           <TypingAnimation />
           
           <motion.p 
@@ -189,6 +195,16 @@ function HomePage() {
             </button>
           </motion.div>
         </motion.div>
+      </motion.section>
+
+      {/* 3D Globe Section */}
+      <motion.section
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8 }}
+      >
+        <ThreeDGlobe />
       </motion.section>
 
       {/* Features Section */}
